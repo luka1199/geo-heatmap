@@ -1,66 +1,43 @@
+import json
+import os
 
-import folium
-from folium.plugins import HeatMap
-import pandas as pd
-from argparse import ArgumentParser
+# SETTINGS
+MAP_ZOOM_START = 6
+HEATMAP_RADIUS = 7
+HEATMAP_BLUR = 4
+HEATMAP_MIN_OPACITY = 0.2
 
+COORDS = {}
+max = 0
+max_coords = (0, 0)
 
-if __name__ == '__main__':
-    parser = ArgumentParser()
-    parser.add_argument('-c', '--csv', dest='csv', type=str, required=False,
-                        help='Path to CSV data file', default='heatmap.csv')
-    parser.add_argument('-o', '--output', dest='output', type=str, required=False,
-                        help='Path of html geographical heatmap', default='geo_heatmap.html')
-    parser.add_argument('-ml', '--map_location', nargs='+', dest='map_location', type=str, required=False,
-                        help='Latitude and Longitude of Map (Northing, Easting)', default=['55.0', '24.0'])
-    parser.add_argument('-mzs', '--map_zoom_start', dest='map_zoom_start', type=int, required=False,
-                        help='Initial zoom level for the map', default=7)
-    parser.add_argument('-hmr', '--heatmap_radius', dest='heatmap_radius', type=int, required=False,
-                        help='Heatmap radius of each “point” of the heatmap', default=5)
-    parser.add_argument('-hmb', '--headmap_blur', dest='heatmap_blur', type=int, required=False,
-                        help='Heatmap amount of blur', default=5)
-    parser.add_argument('-hmmo', '--heatmap_min_opocity', dest='heatmap_min_opocity', type=float, required=False,
-                        help='Heatmap minimum opacity the heat will start at', default=0.2)
-    parser.add_argument('-hmmz', '--heatmap_max_zoom', dest='heatmap_max_zoom', type=int, required=False,
-                        help='Heatmap max zoom', default=4)
-    parser.add_argument('-mt', '--map_tiles', dest='tiles', type=str, required=False,
-                        help='Map tileset to use', default='OpenStreetMap')
-    parser.add_argument('-mv', '--max_value', dest='max_value', type=str, required=False,
-                        help='Max magnitude value')
+with open('heatmap.csv', 'w') as output:
+    output.write("name;lat;lon;magnitude\n")
+    with open('locations.json') as json_file:
+        print("Loading data...")
+        data = json.load(json_file)
+        data_len = len(data["locations"])
+        i = 1
+        for loc in data["locations"]:
+            lat = round(loc["latitudeE7"]/10000000, 6)
+            lon = round(loc["longitudeE7"]/10000000, 6)
+            if (lat, lon) in COORDS.keys():
+                COORDS[(lat, lon)] += 1
+            else:
+                COORDS[(lat, lon)] = 1
+            # if i % 1000 == 0:
+            #     print(i, "/", data_len, sep="")
+            i += 1
 
-    args = parser.parse_args()
+        print("Generating .csv file...")
+        i = 0
+        for key, value in COORDS.items():
+            output.write("{};{};{};{}\n".format(i, key[0], key[1], value))
+            if value > max:
+                max = value
+                max_coords = key
+            i += 1
 
-    print('*' * 50)
-    for i in vars(args):
-        print(str(i) + ' - ' + str(getattr(args, i)))
-
-    print('*' * 50)
-
-    try:
-        location = [float(i) for i in args.map_location]
-
-        for_map = pd.read_csv(args.csv, sep=';')
-
-        max_amount = float(args.max_value) if args.max_value else float(for_map['magnitude'].max())
-        hmap = folium.Map(location=location,
-                          zoom_start=args.map_zoom_start,
-                          tiles=args.tiles)
-
-        hmap_data = [[row['lat'], row['lon'], row['magnitude']] for index, row in for_map.iterrows()]
-
-        hm = folium.plugins.HeatMap(hmap_data,
-                                    max_val=max_amount,
-                                    min_opacity=args.heatmap_min_opocity,
-                                    radius=args.heatmap_radius,
-                                    blur=args.heatmap_blur,
-                                    max_zoom=args.heatmap_max_zoom)
-
-        hmap.add_child(hm)
-
-        hmap.save(args.output)
-
-        print('Output: %s' % args.output)
-    except:
-        import traceback
-        print('Error occurred!')
-        print(traceback.format_exc())
+print("Generating heat map...")
+os.system("python heatmap_generator.py -ml {} {} -mzs {} -hmr {} -hmb {} -hmmo {}".format(max_coords[0],
+            max_coords[1], MAP_ZOOM_START, HEATMAP_RADIUS, HEATMAP_BLUR, HEATMAP_MIN_OPACITY))

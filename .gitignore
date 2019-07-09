@@ -3,7 +3,11 @@
 # Edit at https://www.gitignore.io/?templates=python
 
 # google location data files
-*.json
+locations.json
+
+# generated files
+heatmap.csv
+heatmap.html
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
