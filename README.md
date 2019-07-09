@@ -12,7 +12,7 @@ For this script you just have to download your location history, which is provid
 
 ### Prepare your data
 
-Rename the JSON file to "locations.json" and paste it in the project folder.
+Rename the JSON file to `locations.json` and paste it in the project folder.
 
 ### Run the script
 ```
