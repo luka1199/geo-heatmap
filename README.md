@@ -1,6 +1,6 @@
 # geo-heatmap
 
-A script that generates a geo heatmap from your location data provided by google using folium and OpenStreetMap.
+A script that generates an interactive geo heatmap from your location data provided by google using folium and OpenStreetMap.
 
 ## How to get your location data
 
