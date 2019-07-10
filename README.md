@@ -19,4 +19,4 @@ Rename the JSON file to `locations.json` and paste it in the project folder.
 ```
 python geo_heatmap.py
 ```
-The script will generate a CSV file named `heatmap.cs` and a HTML file named `heatmap.html`. Open the `heatmap.html` file to see your heatmap.
+The script will generate a CSV file named `heatmap.csv` and a HTML file named `heatmap.html`. Open the `heatmap.html` file to see your heatmap.
