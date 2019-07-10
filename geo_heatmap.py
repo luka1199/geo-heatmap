@@ -38,6 +38,6 @@ with open('heatmap.csv', 'w') as output:
                 max_coords = key
             i += 1
 
-print("Generating heat map...")
+print("Generating heatmap...")
 os.system("python heatmap_generator.py -ml {} {} -mzs {} -hmr {} -hmb {} -hmmo {}".format(max_coords[0],
             max_coords[1], MAP_ZOOM_START, HEATMAP_RADIUS, HEATMAP_BLUR, HEATMAP_MIN_OPACITY))
