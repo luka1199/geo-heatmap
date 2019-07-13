@@ -36,32 +36,24 @@ if __name__ == '__main__':
         print(str(i) + ' - ' + str(getattr(args, i)))
 
     print('-' * 50)
+    location = [float(i) for i in args.map_location]
 
-    try:
-        location = [float(i) for i in args.map_location]
+    for_map = pd.read_csv(args.csv, sep=';')
 
-        for_map = pd.read_csv(args.csv, sep=';')
+    max_amount = float(args.max_value) if args.max_value else float(for_map['magnitude'].max())
+    map = folium.Map(location=location,
+                      zoom_start=args.map_zoom_start,
+                      tiles=args.tiles)
 
-        max_amount = float(args.max_value) if args.max_value else float(for_map['magnitude'].max())
-        hmap = folium.Map(location=location,
-                          zoom_start=args.map_zoom_start,
-                          tiles=args.tiles)
+    map_data = [[row['lat'], row['lon'], row['magnitude']] for index, row in for_map.iterrows()]
 
-        hmap_data = [[row['lat'], row['lon'], row['magnitude']] for index, row in for_map.iterrows()]
+    heatmap = folium.plugins.HeatMap(map_data,
+                                max_val=max_amount,
+                                min_opacity=args.heatmap_min_opocity,
+                                radius=args.heatmap_radius,
+                                blur=args.heatmap_blur,
+                                max_zoom=args.heatmap_max_zoom)
 
-        hm = folium.plugins.HeatMap(hmap_data,
-                                    max_val=max_amount,
-                                    min_opacity=args.heatmap_min_opocity,
-                                    radius=args.heatmap_radius,
-                                    blur=args.heatmap_blur,
-                                    max_zoom=args.heatmap_max_zoom)
+    map.add_child(heatmap)
 
-        hmap.add_child(hm)
-
-        hmap.save(args.output)
-
-        print('Output: %s' % args.output)
-    except:
-        import traceback
-        print('Error occurred!')
-        print(traceback.format_exc())
+    map.save(args.output)
