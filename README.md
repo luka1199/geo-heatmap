@@ -2,7 +2,7 @@
 
 A script that generates an interactive geo heatmap from your location data provided by google using folium and OpenStreetMap.
 
-<center><img src="screenshot.png" style="width:400px"></center>
+<center><img src="screenshot.png" style="width:300"></center>
 
 ## How to get your location data
 
