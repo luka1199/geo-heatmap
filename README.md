@@ -13,6 +13,11 @@ For this script you just have to download your location history, which is provid
 
 ## Getting Started
 
+### Dependencies
+```
+pip install -r requirements.txt
+```
+
 ### Prepare your data
 
 Rename the JSON file to `locations.json` and paste it in the project folder.
