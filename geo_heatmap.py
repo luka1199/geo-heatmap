@@ -73,11 +73,10 @@ class Generator:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python geo_heatmap.py <file>")
-        sys.exit()
-    elif len(sys.argv) == 2:
+    if len(sys.argv) > 1:
         data_file = sys.argv[1]
-
         generator = Generator()
         generator.run(data_file, "heatmap.html")
+    else:
+        print("Usage: python geo_heatmap.py <file>")
+        sys.exit()
