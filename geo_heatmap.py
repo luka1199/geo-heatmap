@@ -1,5 +1,7 @@
 import json
 import sys
+import os
+import webbrowser
 import folium
 from folium.plugins import HeatMap
 
@@ -75,8 +77,11 @@ class Generator:
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         data_file = sys.argv[1]
+        output_file = "heatmap.html"
         generator = Generator()
-        generator.run(data_file, "heatmap.html")
+        generator.run(data_file, output_file)
+        print("Opening {} in browser...".format(output_file))
+        webbrowser.open('file://' + os.path.realpath(output_file))
     else:
         print("Usage: python geo_heatmap.py <file>")
         sys.exit()
