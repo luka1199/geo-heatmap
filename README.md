@@ -18,12 +18,10 @@ For this script you just have to download your location history, which is provid
 pip install -r requirements.txt
 ```
 
-### Prepare your data
-
-Rename the JSON file to `locations.json` and paste it in the project folder.
-
 ### Run the script
 ```
-python geo_heatmap.py
+python geo_heatmap.py <file>
 ```
-The script will generate a CSV file named `heatmap.csv` and a HTML file named `heatmap.html`. Open the `heatmap.html` file to see your heatmap.
+Enter JSON file name as the file argument.
+
+The script will generate a HTML file named `heatmap.html`. Open the `heatmap.html` file to see your heatmap.

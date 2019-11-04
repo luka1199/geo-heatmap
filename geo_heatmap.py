@@ -1,43 +1,83 @@
 import json
-import os
+import sys
+import folium
+from folium.plugins import HeatMap
 
-# SETTINGS
-MAP_ZOOM_START = 6
-HEATMAP_RADIUS = 7
-HEATMAP_BLUR = 4
-HEATMAP_MIN_OPACITY = 0.2
 
-COORDS = {}
-max = 0
-max_coords = (0, 0)
+class Generator:
+    def __init__(self):
+        self.coordinates = {}
+        self.max_coordinates = (0, 0)
+        self.max_magnitude = 0
 
-with open('heatmap.csv', 'w') as output:
-    output.write("name;lat;lon;magnitude\n")
-    with open('locations.json') as json_file:
-        print("Loading data...")
-        data = json.load(json_file)
-        data_len = len(data["locations"])
-        i = 1
-        for loc in data["locations"]:
-            lat = round(loc["latitudeE7"]/10000000, 6)
-            lon = round(loc["longitudeE7"]/10000000, 6)
-            if (lat, lon) in COORDS.keys():
-                COORDS[(lat, lon)] += 1
-            else:
-                COORDS[(lat, lon)] = 1
-            # if i % 1000 == 0:
-            #     print(i, "/", data_len, sep="")
-            i += 1
+    def loadData(self, file_name):
+        """Loads the google location data from the given json file.
+        
+        Arguments:
+            file_name {string} -- The name of the json file with the google location data.
+        """
+        with open(file_name) as json_file:
+            data = json.load(json_file)
+            for loc in data["locations"]:
+                lat = round(loc["latitudeE7"] / 1e7, 6)
+                lon = round(loc["longitudeE7"] / 1e7, 6)
+                if (lat, lon) in self.coordinates.keys():
+                    self.coordinates[(lat, lon)] += 1
+                else:
+                    self.coordinates[(lat, lon)] = 1
 
-        print("Generating .csv file...")
-        i = 0
-        for key, value in COORDS.items():
-            output.write("{};{};{};{}\n".format(i, key[0], key[1], value))
-            if value > max:
-                max = value
-                max_coords = key
-            i += 1
+                if self.coordinates[(lat, lon)] > self.max_magnitude:
+                    self.max_coordinates = (lat, lon)
 
-print("Generating heatmap...")
-os.system("python heatmap_generator.py -ml {} {} -mzs {} -hmr {} -hmb {} -hmmo {}".format(max_coords[0],
-            max_coords[1], MAP_ZOOM_START, HEATMAP_RADIUS, HEATMAP_BLUR, HEATMAP_MIN_OPACITY))
+
+    def generateMap(self, map_zoom_start=6, heatmap_radius=7, 
+                    heatmap_blur=4, heatmap_min_opacity = 0.2, heatmap_max_zoom=4):
+        """Generates a heatmap and saves it in the output_file.
+        
+        Arguments:
+            output_file {string} -- The name of the output file.
+        """
+        map_data = [(coords[0], coords[1], magnitude)
+                    for coords, magnitude in self.coordinates.items()]
+        max_amount = max(self.coordinates.values())
+
+        # Generate map
+        map = folium.Map(location=self.max_coordinates,
+                        zoom_start=map_zoom_start,
+                         tiles="OpenStreetMap")
+
+        # Generate heat map
+        heatmap = folium.plugins.HeatMap(map_data,
+                                        max_val=max_amount,
+                                        min_opacity=heatmap_min_opacity,
+                                        radius=heatmap_radius,
+                                        blur=heatmap_blur,
+                                        max_zoom=heatmap_max_zoom)
+
+        map.add_child(heatmap)
+        return map
+
+    def run(self, data_file, output_file):
+        """Load the data, generate the heatmap and save it.
+        
+        Arguments:
+            data_file {string} -- The name of the json file with the google location data.
+            output_file {[type]} -- The name of the output file.
+        """
+        print("Loading data from {}...".format(data_file))
+        self.loadData(data_file)
+        print("Generating heatmap...")
+        map = self.generateMap()
+        print("Saving map to {}...".format(output_file))
+        map.save(output_file)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python geo_heatmap.py <file>")
+        sys.exit()
+    elif len(sys.argv) == 2:
+        data_file = sys.argv[1]
+
+        generator = Generator()
+        generator.run(data_file, "heatmap.html")
