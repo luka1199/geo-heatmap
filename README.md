@@ -24,4 +24,4 @@ python geo_heatmap.py <file>
 ```
 Enter JSON file name as the file argument.
 
-The script will generate a HTML file named `heatmap.html`. Open the `heatmap.html` file to see your heatmap.
+The script will generate a HTML file named `heatmap.html` which will automatically open in your browser.
