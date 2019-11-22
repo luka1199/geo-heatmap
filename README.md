@@ -6,10 +6,10 @@ This is a script that generates an interactive geo heatmap from your Google loca
 
 ## Getting Started
 
-## 1. Install Python 3+
+### 1. Install Python 3+
 If you don't already have Python 3+ installed, grab it from <https://www.python.org/downloads/>. You'll want to download install the latest version of **Python 3.x**. As of 2019-11-22, that is Version 3.8.
 
-## 2. Get Your Location Data
+### 2. Get Your Location Data
 
 Here you can find out how to download your Google data: <https://support.google.com/accounts/answer/3024190?hl=en></br>
 Here you can download all of the data that Google has stored on you: <https://takeout.google.com/>
@@ -37,9 +37,9 @@ Replace the string `<file>` from above with the path to the `LocationHistory.jso
 
 The script will generate a HTML file named `heatmap.html`. This file will automatically open in your browser once the script completes. Enjoy!
 
-### FAQ
+## FAQ
 
-#### I'm getting an "Out of Memory" or `MemoryError` error when I try to run the script. What's going on?
+### I'm getting an "Out of Memory" or `MemoryError` error when I try to run the script. What's going on?
 Your `LocationHistory.json` file is probably huge, and Python is running out of memory when the script tries to parse that file.
 
 To fix this, download and install the 64-bit version of Python. To do this:
