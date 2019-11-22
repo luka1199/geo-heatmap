@@ -23,13 +23,12 @@ class Generator:
             for loc in data["locations"]:
                 lat = round(loc["latitudeE7"] / 1e7, 6)
                 lon = round(loc["longitudeE7"] / 1e7, 6)
-                if (lat, lon) in self.coordinates.keys():
+                try:
                     self.coordinates[(lat, lon)] += 1
-                else:
+                    if self.coordinates[(lat, lon)] > self.max_magnitude:
+                        self.max_coordinates = (lat, lon)
+                except KeyError:
                     self.coordinates[(lat, lon)] = 1
-
-                if self.coordinates[(lat, lon)] > self.max_magnitude:
-                    self.max_coordinates = (lat, lon)
 
 
     def generateMap(self, map_zoom_start=6, heatmap_radius=7, 
