@@ -7,7 +7,6 @@
 takeout-*.zip
 
 # generated files
-heatmap.csv
 heatmap.html
 
 ### Python ###
