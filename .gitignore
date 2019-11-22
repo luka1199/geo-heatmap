@@ -4,7 +4,7 @@
 
 # google location data files
 *.json
-*.zip
+takeout-*.zip
 
 # generated files
 heatmap.csv
