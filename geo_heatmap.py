@@ -27,6 +27,7 @@ class Generator:
                     self.coordinates[(lat, lon)] += 1
                     if self.coordinates[(lat, lon)] > self.max_magnitude:
                         self.max_coordinates = (lat, lon)
+                        self.max_magnitude = self.coordinates[(lat, lon)]
                 except KeyError:
                     self.coordinates[(lat, lon)] = 1
 
@@ -40,7 +41,7 @@ class Generator:
         """
         map_data = [(coords[0], coords[1], magnitude)
                     for coords, magnitude in self.coordinates.items()]
-        max_amount = max(self.coordinates.values())
+        max_amount = self.max_magnitude
 
         # Generate map
         map = folium.Map(location=self.max_coordinates,
