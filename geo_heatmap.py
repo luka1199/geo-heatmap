@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
+import collections
 import json
-import sys
 import os
+import sys
 import webbrowser
 import folium
 from folium.plugins import HeatMap
@@ -8,7 +11,7 @@ from folium.plugins import HeatMap
 
 class Generator:
     def __init__(self):
-        self.coordinates = {}
+        self.coordinates = collections.defaultdict(int)
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
 
@@ -23,13 +26,10 @@ class Generator:
             for loc in data["locations"]:
                 lat = round(loc["latitudeE7"] / 1e7, 6)
                 lon = round(loc["longitudeE7"] / 1e7, 6)
-                try:
-                    self.coordinates[(lat, lon)] += 1
-                    if self.coordinates[(lat, lon)] > self.max_magnitude:
-                        self.max_coordinates = (lat, lon)
-                        self.max_magnitude = self.coordinates[(lat, lon)]
-                except KeyError:
-                    self.coordinates[(lat, lon)] = 1
+                self.coordinates[(lat, lon)] += 1
+                if self.coordinates[(lat, lon)] > self.max_magnitude:
+                    self.max_coordinates = (lat, lon)
+                    self.max_magnitude = self.coordinates[(lat, lon)]
 
 
     def generateMap(self, map_zoom_start=6, heatmap_radius=7, 
@@ -41,23 +41,22 @@ class Generator:
         """
         map_data = [(coords[0], coords[1], magnitude)
                     for coords, magnitude in self.coordinates.items()]
-        max_amount = self.max_magnitude
 
         # Generate map
-        map = folium.Map(location=self.max_coordinates,
+        m = folium.Map(location=self.max_coordinates,
                         zoom_start=map_zoom_start,
                          tiles="OpenStreetMap")
 
         # Generate heat map
         heatmap = folium.plugins.HeatMap(map_data,
-                                        max_val=max_amount,
+                                        max_val=self.max_magnitude,
                                         min_opacity=heatmap_min_opacity,
                                         radius=heatmap_radius,
                                         blur=heatmap_blur,
                                         max_zoom=heatmap_max_zoom)
 
-        map.add_child(heatmap)
-        return map
+        m.add_child(heatmap)
+        return m
 
     def run(self, data_file, output_file):
         """Load the data, generate the heatmap and save it.
@@ -69,9 +68,9 @@ class Generator:
         print("Loading data from {}...".format(data_file))
         self.loadData(data_file)
         print("Generating heatmap...")
-        map = self.generateMap()
+        m = self.generateMap()
         print("Saving map to {}...".format(output_file))
-        map.save(output_file)
+        m.save(output_file)
 
 
 if __name__ == "__main__":
@@ -85,3 +84,4 @@ if __name__ == "__main__":
     else:
         print("Usage: python geo_heatmap.py <file>")
         sys.exit()
+
