@@ -7,6 +7,7 @@ import sys
 import webbrowser
 import folium
 from folium.plugins import HeatMap
+from progressbar import ProgressBar, Bar, ETA, Percentage
 
 
 class Generator:
@@ -23,13 +24,16 @@ class Generator:
         """
         with open(file_name) as json_file:
             data = json.load(json_file)
-            for loc in data["locations"]:
-                lat = round(loc["latitudeE7"] / 1e7, 6)
-                lon = round(loc["longitudeE7"] / 1e7, 6)
-                self.coordinates[(lat, lon)] += 1
-                if self.coordinates[(lat, lon)] > self.max_magnitude:
-                    self.max_coordinates = (lat, lon)
-                    self.max_magnitude = self.coordinates[(lat, lon)]
+            w = [Bar(), Percentage(),' ', ETA()]
+            with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
+                for (i, loc) in enumerate(data["locations"]):
+                    lat = round(loc["latitudeE7"] / 1e7, 6)
+                    lon = round(loc["longitudeE7"] / 1e7, 6)
+                    self.coordinates[(lat, lon)] += 1
+                    if self.coordinates[(lat, lon)] > self.max_magnitude:
+                        self.max_coordinates = (lat, lon)
+                        self.max_magnitude = self.coordinates[(lat, lon)]
+                    pb.update(i)
 
 
     def generateMap(self, map_zoom_start=6, heatmap_radius=7, 
