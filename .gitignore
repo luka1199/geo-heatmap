@@ -3,7 +3,8 @@
 # Edit at https://www.gitignore.io/?templates=python
 
 # google location data files
-locations.json
+*.json
+*.zip
 
 # generated files
 heatmap.csv
