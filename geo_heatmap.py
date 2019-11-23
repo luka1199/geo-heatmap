@@ -10,6 +10,8 @@ from folium.plugins import HeatMap
 from progressbar import ProgressBar, Bar, ETA, Percentage
 
 
+TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
+
 class Generator:
     def __init__(self):
         self.coordinates = collections.defaultdict(int)
@@ -75,6 +77,21 @@ class Generator:
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
         m.save(output_file)
+        
+
+def isTextBasedBrowser(browser):
+    """Returns if browser is a text-based browser
+    
+    Arguments:
+        browser {webbrowser.BaseBrowser} -- A browser
+
+    Returns:
+        bool -- True if browser is text-based, False if browser is not text-based
+    """
+    for tb_browser in TEXT_BASED_BROWSERS:
+        if type(browser) is tb_browser:
+            return True
+    return False
 
 
 if __name__ == "__main__":
@@ -83,8 +100,10 @@ if __name__ == "__main__":
         output_file = "heatmap.html"
         generator = Generator()
         generator.run(data_file, output_file)
-        print("Opening {} in browser...".format(output_file))
-        webbrowser.open('file://' + os.path.realpath(output_file))
+        # Check if browser is text-based
+        if not isTextBasedBrowser(webbrowser.get()):
+            print("Opening {} in browser...".format(output_file))
+            webbrowser.open('file://' + os.path.realpath(output_file))
     else:
         print("Usage: python geo_heatmap.py <file>")
         sys.exit()
