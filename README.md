@@ -1,4 +1,4 @@
-# geo-heatmap
+# Geo Heatmap
 
 This is a script that generates an interactive geo heatmap from your Google location history data using Python, `folium` and OpenStreetMap.
 
