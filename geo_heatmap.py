@@ -29,6 +29,8 @@ class Generator:
             w = [Bar(), Percentage(),' ', ETA()]
             with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
                 for (i, loc) in enumerate(data["locations"]):
+                    if "latitudeE7" not in loc or "longitudeE7" not in loc:
+                        continue
                     lat = round(loc["latitudeE7"] / 1e7, 6)
                     lon = round(loc["longitudeE7"] / 1e7, 6)
                     self.coordinates[(lat, lon)] += 1
