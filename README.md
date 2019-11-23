@@ -1,4 +1,4 @@
-# geo-heatmap
+# Geo Heatmap
 
 This is a script that generates an interactive geo heatmap from your Google location history data using Python, `folium` and OpenStreetMap.
 
@@ -43,7 +43,7 @@ The script will generate a HTML file named `heatmap.html`. This file will automa
 Your `LocationHistory.json` file is probably huge, and Python is running out of memory when the script tries to parse that file.
 
 To fix this, download and install the 64-bit version of Python. To do this:
-1. Go to (python.org)[https://www.python.org/downloads/].
+1. Go to [python.org](https://www.python.org/downloads/).
 2. Click the link corresponding to your OS next to "Looking for Python with a different OS?"
 3. Click the "Latest Python 3 Release" link.
 4. Scroll down to "Files".
