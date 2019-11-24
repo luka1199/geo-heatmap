@@ -12,6 +12,7 @@ from progressbar import ProgressBar, Bar, ETA, Percentage
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
 
+
 class Generator:
     def __init__(self):
         self.coordinates = collections.defaultdict(int)
@@ -20,14 +21,17 @@ class Generator:
 
     def loadData(self, file_name):
         """Loads the google location data from the given json file.
-        
+
         Arguments:
-            file_name {string} -- The name of the json file with the google location data.
+            file_name {string} -- The name of the json file with the google
+                location data.
         """
         with open(file_name) as json_file:
             data = json.load(json_file)
-            w = [Bar(), Percentage(),' ', ETA()]
-            with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
+            w = [Bar(), Percentage(), ' ', ETA()]
+            with ProgressBar(
+                    max_value=len(data["locations"]),
+                    widgets=w) as pb:
                 for (i, loc) in enumerate(data["locations"]):
                     if "latitudeE7" not in loc or "longitudeE7" not in loc:
                         continue
@@ -39,11 +43,11 @@ class Generator:
                         self.max_magnitude = self.coordinates[(lat, lon)]
                     pb.update(i)
 
-
-    def generateMap(self, map_zoom_start=6, heatmap_radius=7, 
-                    heatmap_blur=4, heatmap_min_opacity = 0.2, heatmap_max_zoom=4):
+    def generateMap(self, map_zoom_start=6, heatmap_radius=7,
+                    heatmap_blur=4, heatmap_min_opacity=0.2,
+                    heatmap_max_zoom=4):
         """Generates a heatmap and saves it in the output_file.
-        
+
         Arguments:
             output_file {string} -- The name of the output file.
         """
@@ -52,25 +56,27 @@ class Generator:
 
         # Generate map
         m = folium.Map(location=self.max_coordinates,
-                        zoom_start=map_zoom_start,
-                         tiles="OpenStreetMap")
+                       zoom_start=map_zoom_start,
+                       tiles="OpenStreetMap")
 
         # Generate heat map
-        heatmap = folium.plugins.HeatMap(map_data,
-                                        max_val=self.max_magnitude,
-                                        min_opacity=heatmap_min_opacity,
-                                        radius=heatmap_radius,
-                                        blur=heatmap_blur,
-                                        max_zoom=heatmap_max_zoom)
+        heatmap = folium.plugins.HeatMap(
+                                    map_data,
+                                    max_val=self.max_magnitude,
+                                    min_opacity=heatmap_min_opacity,
+                                    radius=heatmap_radius,
+                                    blur=heatmap_blur,
+                                    max_zoom=heatmap_max_zoom)
 
         m.add_child(heatmap)
         return m
 
     def run(self, data_file, output_file):
         """Load the data, generate the heatmap and save it.
-        
+
         Arguments:
-            data_file {string} -- The name of the json file with the google location data.
+            data_file {string} -- The name of the json file with the google
+                location data.
             output_file {[type]} -- The name of the output file.
         """
         print("Loading data from {}...".format(data_file))
@@ -79,16 +85,17 @@ class Generator:
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
         m.save(output_file)
-        
+
 
 def isTextBasedBrowser(browser):
-    """Returns if browser is a text-based browser
-    
+    """Returns if browser is a text-based browser.
+
     Arguments:
-        browser {webbrowser.BaseBrowser} -- A browser
+        browser {webbrowser.BaseBrowser} -- A browser.
 
     Returns:
-        bool -- True if browser is text-based, False if browser is not text-based
+        bool -- True if browser is text-based, False if browser is not
+            text-based.
     """
     for tb_browser in TEXT_BASED_BROWSERS:
         if type(browser) is tb_browser:
@@ -109,4 +116,3 @@ if __name__ == "__main__":
     else:
         print("Usage: python geo_heatmap.py <file>")
         sys.exit()
-
