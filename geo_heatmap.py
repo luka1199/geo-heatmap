@@ -40,13 +40,11 @@ class Generator:
                 for (i, loc) in enumerate(data["locations"]):
                     if "latitudeE7" not in loc or "longitudeE7" not in loc:
                         continue
-                    timestamp = loc['timestampMs']
-                    dt = int(timestamp) / 1000
-                    dt_object = datetime.fromtimestamp(dt)
-                    string = str(dt_object)
-                    string = string.split(' ')
-                    string = string[0]
-                    if string != searchs:
+                    
+                    timestamp = int(loc['timestampMs']) / 1000
+                    dt = str(datetime.fromtimestamp(timestamp)).split(' ')[0]
+
+                    if dt != searchs:
                         continue
                     lat = round(loc["latitudeE7"] / 1e7, 6)
                     lon = round(loc["longitudeE7"] / 1e7, 6)
