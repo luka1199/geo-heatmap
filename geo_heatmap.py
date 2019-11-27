@@ -8,6 +8,7 @@ import webbrowser
 import folium
 from folium.plugins import HeatMap
 from progressbar import ProgressBar, Bar, ETA, Percentage
+from datetime import datetime
 
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
@@ -19,21 +20,33 @@ class Generator:
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
 
-    def loadData(self, file_name):
+    def loadData(self, file_name, year, month, day):
         """Loads the google location data from the given json file.
 
         Arguments:
-            file_name {string} -- The name of the json file with the google
-                location data.
+            file_name {string} -- The name of the json file with the google        
+            location data.
+            
+            I know the kode to messy but i will fix it. It is my first progran as a hobby enthusiast
+            and my first upload to git hub.
         """
         with open(file_name) as json_file:
             data = json.load(json_file)
+            searchs = year + '-' + month + '-' + day
             w = [Bar(), Percentage(), ' ', ETA()]
             with ProgressBar(
                     max_value=len(data["locations"]),
                     widgets=w) as pb:
                 for (i, loc) in enumerate(data["locations"]):
                     if "latitudeE7" not in loc or "longitudeE7" not in loc:
+                        continue
+                    timestamp = loc['timestampMs']
+                    dt = int(timestamp) / 1000
+                    dt_object = datetime.fromtimestamp(dt)
+                    string = str(dt_object)
+                    string = string.split(' ')
+                    string = string[0]
+                    if string != searchs:
                         continue
                     lat = round(loc["latitudeE7"] / 1e7, 6)
                     lon = round(loc["longitudeE7"] / 1e7, 6)
@@ -42,6 +55,7 @@ class Generator:
                         self.max_coordinates = (lat, lon)
                         self.max_magnitude = self.coordinates[(lat, lon)]
                     pb.update(i)
+
 
     def generateMap(self, map_zoom_start=6, heatmap_radius=7,
                     heatmap_blur=4, heatmap_min_opacity=0.2,
@@ -71,7 +85,7 @@ class Generator:
         m.add_child(heatmap)
         return m
 
-    def run(self, data_file, output_file):
+    def run(self, data_file, year, month, day, output_file):
         """Load the data, generate the heatmap and save it.
 
         Arguments:
@@ -79,8 +93,9 @@ class Generator:
                 location data.
             output_file {[type]} -- The name of the output file.
         """
+
         print("Loading data from {}...".format(data_file))
-        self.loadData(data_file)
+        self.loadData(data_file, year, month, day)
         print("Generating heatmap...")
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
@@ -106,9 +121,12 @@ def isTextBasedBrowser(browser):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         data_file = sys.argv[1]
+        year = sys.argv[2]
+        month = sys.argv[3]
+        day = sys.argv[4]
         output_file = "heatmap.html"
         generator = Generator()
-        generator.run(data_file, output_file)
+        generator.run(data_file, year, month, day, output_file)
         # Check if browser is text-based
         if not isTextBasedBrowser(webbrowser.get()):
             print("Opening {} in browser...".format(output_file))
