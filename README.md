@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ### 5. Run the Script
 In the same command prompt or Terminal window, type the following, and press enter:
 ```
-python geo_heatmap.py <file> yyyy mounth day
+python geo_heatmap.py <file> yyyy month day
 ```
 Replace the string `<file>` from above with the path to the `LocationHistory.json` JSON file from Google Takeout.
 
