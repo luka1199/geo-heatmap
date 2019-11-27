@@ -1,6 +1,6 @@
 # Geo Heatmap
 
-This is a script that generates an interactive geo heatmap from your Google location history for a specific date. Soon i will try to add a function that makes you able to search dates in randge and add options. 
+This is a script that generates an interactive geo heatmap from your Google location history for a specific date. Soon i will try to add a function that makes you able to search dates in range and add options. 
 
 <p align="center"><img src="https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png" alt="screenshot" width="400"></p>
 
