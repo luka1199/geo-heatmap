@@ -1,6 +1,6 @@
 # Geo Heatmap
 
-This is a script that generates an interactive geo heatmap from your Google location history data using Python, Folium and OpenStreetMap.
+This is a script that generates an interactive geo heatmap from your Google location history for a specific date. Soon i will try to add a function that makes you able to search dates in randge and add options. 
 
 <p align="center"><img src="https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png" alt="screenshot" width="400"></p>
 
@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ### 5. Run the Script
 In the same command prompt or Terminal window, type the following, and press enter:
 ```
-python geo_heatmap.py <file>
+python geo_heatmap.py <file> yyyy mounth day
 ```
 Replace the string `<file>` from above with the path to the `LocationHistory.json` JSON file from Google Takeout.
 
