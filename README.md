@@ -49,3 +49,6 @@ To fix this, download and install the 64-bit version of Python. To do this:
 4. Scroll down to "Files".
 5. Click to download the x64 release. For example, on Windows, that's the "Windows x86-64 executable installer" link.
 6. Install!
+
+### I'm getting a `SyntaxError` when running `pip install -r requirements.txt` or `python geo_heatmap.py <file>`. What am I doing wrong?
+You are probably using the python interpreter to run these commands. Try to run them in cmd.exe or Windows PowerShell (Windows) or the Terminal (Linux, MacOS).
