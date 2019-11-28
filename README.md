@@ -20,7 +20,7 @@ To use this script, you only need to select and download your "Location History"
 On <https://github.com/luka1199/geo-heatmap>, click the green "Clone or Download" button at the top right of the page. If you want to get started with this script more quickly, click the "Download ZIP" button, and extract the ZIP somewhere on your computer.
 
 ### 4. Install Dependencies
-In a command prompt or Terminal window, navigate to the directory containing this repository's files. Then, type the following, and press enter:
+In a [command prompt or Terminal window](https://tutorial.djangogirls.org/en/intro_to_command_line/#what-is-the-command-line), [navigate to the directory](https://tutorial.djangogirls.org/en/intro_to_command_line/#change-current-directory) containing this repository's files. Then, type the following, and press enter:
 
 ```
 pip install -r requirements.txt
