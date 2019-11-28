@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''
-Warning messy code!!! I am using i as notes to.
+Warning messy code!!! I am using it as notes to.
 
 
 '''
