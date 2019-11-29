@@ -30,18 +30,15 @@ class Generator:
         with open(file_name) as json_file:
             data = json.load(json_file)
             w = [Bar(), Percentage(), ' ', ETA()]
-            with ProgressBar(
-                    max_value=len(data["locations"]),
-                    widgets=w) as pb:
-                for (i, loc) in enumerate(data["locations"]):
+            with ProgressBar(max_value=len(data["locations"]),
+                             widgets=w) as pb:
+                for i, loc in enumerate(data["locations"]):
                     if "latitudeE7" not in loc or "longitudeE7" not in loc:
                         continue
-                    lat = round(loc["latitudeE7"] / 1e7, 6)
-                    lon = round(loc["longitudeE7"] / 1e7, 6)
-                    self.coordinates[(lat, lon)] += 1
-                    if self.coordinates[(lat, lon)] > self.max_magnitude:
-                        self.max_coordinates = (lat, lon)
-                        self.max_magnitude = self.coordinates[(lat, lon)]
+                    lat_lon = (round(loc["latitudeE7"] / 1e7, 6),
+                               round(loc["longitudeE7"] / 1e7, 6))
+                    
+                    self.coordUpdate(lat_lon)
                     pb.update(i)
 
     def loadKMLData(self, file_name):
@@ -51,39 +48,30 @@ class Generator:
             file_name {string} -- The name of the KML file with the google 
                 location data.
         """
-        with open(file_name) as kml_file:
-            xmldoc = minidom.parse(file_name)
-            kml = xmldoc.getElementsByTagName("kml")[0]
-            document = kml.getElementsByTagName("Document")[0]
-            placemark = document.getElementsByTagName("Placemark")[0]
-            gxtrack = placemark.getElementsByTagName("gx:coord")
-            w = [Bar(), Percentage(), ' ', ETA()]
+        xmldoc = minidom.parse(file_name)
+        kml = xmldoc.getElementsByTagName("kml")[0]
+        document = kml.getElementsByTagName("Document")[0]
+        placemark = document.getElementsByTagName("Placemark")[0]
+        gxtrack = placemark.getElementsByTagName("gx:coord")
+        w = [Bar(), Percentage(), ' ', ETA()]
 
-            with ProgressBar(
-                    max_value=len(gxtrack),
-                    widgets=w) as pb:
+        with ProgressBar(max_value=len(gxtrack), widgets=w) as pb:
+            for i, number in enumerate(gxtrack):
+                loc = (number.firstChild.data).split()
+                lat_lon = (loc[1], loc[0])
 
-                i = 0
+                self.coordUpdate(lat_lon)
+                pb.update(i)
 
-                for number in gxtrack:
-                    lon = (number.firstChild.data).split()[0]
-                    lat = (number.firstChild.data).split()[1]
-                    i = i + 1
-
-                    self.coordinates[(lat, lon)] += 1
-                    if self.coordinates[(lat, lon)] > self.max_magnitude:
-                        self.max_coordinates = (lat, lon)
-                        self.max_magnitude = self.coordinates[(lat, lon)]
-                    pb.update(i)
+    def coordUpdate(self, lat_lon):
+        self.coordinates[lat_lon] += 1
+        if self.coordinates[lat_lon] > self.max_magnitude:
+            self.max_coordinates = lat_lon
+            self.max_magnitude = self.coordinates[lat_lon]
 
     def generateMap(self, map_zoom_start=6, heatmap_radius=7,
                     heatmap_blur=4, heatmap_min_opacity=0.2,
                     heatmap_max_zoom=4):
-        """Generates a heatmap and saves it in the output_file.
-
-        Arguments:
-            output_file {string} -- The name of the output file.
-        """
         map_data = [(coords[0], coords[1], magnitude)
                     for coords, magnitude in self.coordinates.items()]
 
@@ -93,13 +81,12 @@ class Generator:
                        tiles="OpenStreetMap")
 
         # Generate heat map
-        heatmap = folium.plugins.HeatMap(
-                                    map_data,
-                                    max_val=self.max_magnitude,
-                                    min_opacity=heatmap_min_opacity,
-                                    radius=heatmap_radius,
-                                    blur=heatmap_blur,
-                                    max_zoom=heatmap_max_zoom)
+        heatmap = HeatMap(map_data,
+                          max_val=self.max_magnitude,
+                          min_opacity=heatmap_min_opacity,
+                          radius=heatmap_radius,
+                          blur=heatmap_blur,
+                          max_zoom=heatmap_max_zoom)
 
         m.add_child(heatmap)
         return m
@@ -110,7 +97,7 @@ class Generator:
         Arguments:
             data_file {string} -- The name of the json file with the google
                 location data.
-            output_file {[type]} -- The name of the output file.
+            output_file {string} -- The name of the output file.
         """
 
         if(data_file.endswith('.json')):
