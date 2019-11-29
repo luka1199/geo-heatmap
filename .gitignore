@@ -4,6 +4,7 @@
 
 # google location data files
 *.json
+*.kml
 takeout-*.zip
 
 # generated files
