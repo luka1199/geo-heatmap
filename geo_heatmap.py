@@ -8,6 +8,7 @@ import webbrowser
 import folium
 from folium.plugins import HeatMap
 from progressbar import ProgressBar, Bar, ETA, Percentage
+from xml.dom import minidom
 
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
@@ -37,6 +38,38 @@ class Generator:
                         continue
                     lat = round(loc["latitudeE7"] / 1e7, 6)
                     lon = round(loc["longitudeE7"] / 1e7, 6)
+                    self.coordinates[(lat, lon)] += 1
+                    if self.coordinates[(lat, lon)] > self.max_magnitude:
+                        self.max_coordinates = (lat, lon)
+                        self.max_magnitude = self.coordinates[(lat, lon)]
+                    pb.update(i)
+
+    def loadKMLData(self, file_name):
+        """Loads the google location data from the given KML file.
+
+        Arguments:
+            file_name {string} -- The name of the KML file with the google 
+                location data.
+        """
+        with open(file_name) as kml_file:
+            xmldoc = minidom.parse(file_name)
+            kml = xmldoc.getElementsByTagName("kml")[0]
+            document = kml.getElementsByTagName("Document")[0]
+            placemark = document.getElementsByTagName("Placemark")[0]
+            gxtrack = placemark.getElementsByTagName("gx:coord")
+            w = [Bar(), Percentage(), ' ', ETA()]
+
+            with ProgressBar(
+                    max_value=len(gxtrack),
+                    widgets=w) as pb:
+
+                i = 0
+
+                for number in gxtrack:
+                    lon = (number.firstChild.data).split()[0]
+                    lat = (number.firstChild.data).split()[1]
+                    i = i + 1
+
                     self.coordinates[(lat, lon)] += 1
                     if self.coordinates[(lat, lon)] > self.max_magnitude:
                         self.max_coordinates = (lat, lon)
@@ -79,8 +112,13 @@ class Generator:
                 location data.
             output_file {[type]} -- The name of the output file.
         """
-        print("Loading data from {}...".format(data_file))
-        self.loadData(data_file)
+
+        if(data_file.endswith('.json')):
+            print("Loading data from {}...".format(data_file))
+            self.loadData(data_file)
+        elif(data_file.endswith('.kml')):
+            print("Loading data from {}...".format(data_file))
+            self.loadKMLData(data_file)
         print("Generating heatmap...")
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
