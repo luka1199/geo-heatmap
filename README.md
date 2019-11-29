@@ -1,6 +1,6 @@
 # Geo Heatmap
 
-This is a script that generates an interactive geo heatmap from your Google location history for a specific date. Soon i will try to add a function that makes you able to search dates in range and add options. 
+This is a script that generates an interactive geo heatmap from your Google location history for a specific range. Soon i will try to add options and warnigs when data dosent exist for the input date. 
 
 <p align="center"><img src="https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png" alt="screenshot" width="400"></p>
 
@@ -29,9 +29,14 @@ pip install -r requirements.txt
 ### 5. Run the Script
 In the same command prompt or Terminal window, type the following, and press enter:
 ```
-python geo_heatmap.py <file> yyyy month day
+python geo_heatmap.py <file> yyyy month day yyyy month day
 ```
+
 Replace the string `<file>` from above with the path to the `LocationHistory.json` JSON file from Google Takeout.
+### Example 
+```
+python geo_heatmap.py location.json 2018 09 30 2018 10 10
+```
 
 ### 6. Review the Results
 
