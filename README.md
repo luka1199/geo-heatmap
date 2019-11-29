@@ -14,7 +14,7 @@ If you don't already have Python 3+ installed, grab it from <https://www.python.
 Here you can find out how to download your Google data: <https://support.google.com/accounts/answer/3024190?hl=en></br>
 Here you can download all of the data that Google has stored on you: <https://takeout.google.com/>
 
-To use this script, you only need to select and download your "Location History", which Google will provide to you as a JSON file by default.
+To use this script, you only need to select and download your "Location History", which Google will provide to you as a JSON file by default.  KML is also an output option and is accepted for this program.
 
 ### 3. Clone This Repository
 On <https://github.com/luka1199/geo-heatmap>, click the green "Clone or Download" button at the top right of the page. If you want to get started with this script more quickly, click the "Download ZIP" button, and extract the ZIP somewhere on your computer.
