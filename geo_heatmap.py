@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import collections
+import fnmatch
 import json
 import os
 import sys
@@ -9,6 +10,7 @@ import zipfile
 import folium
 from folium.plugins import HeatMap
 from progressbar import ProgressBar, Bar, ETA, Percentage
+from xml.etree import ElementTree
 from xml.dom import minidom
 
 
@@ -63,23 +65,34 @@ class Generator:
                 self.coordUpdate(lat_lon)
                 pb.update(i)
 
-    def load_takeout_zip_data(self, file_name):
+    def load_zip_data(self, file_name):
         """
         Load google location data from a "takeout-*.zip" file.
         """
+        from bs4 import BeautifulSoup
+        """
+        <div class="service_name"><h1 class="data-folder-name" data-english-name="LOCATION_HISTORY" data-folder-name="Location History">Location History</h1></div>
+        """
         zip_file = zipfile.ZipFile(file_name)
         namelist = zip_file.namelist()
-        json_path = 'Takeout/Location History/Location History.json'
-        kml_path = 'Takeout/Location History/Location History.kml'
-        if json_path in namelist:
-            with zip_file.open(json_path) as read_file:
+        (html_path,) = fnmatch.filter(namelist, "Takeout/*.html")
+        with zip_file.open(html_path) as read_file:
+            soup = BeautifulSoup(read_file, "html.parser")
+        (elem,) = soup.select("#service-tile-LOCATION_HISTORY > button > div.service_summary > div > h1[data-english-name=LOCATION_HISTORY]")
+        name = elem['data-folder-name']
+        (data_path,) = fnmatch.filter(namelist, "Takeout/{name}/{name}.*".format(name=name))
+        print("Reading location data file from zip archive: {!r}".format(data_path))
+        if data_path.endswith(".json"):
+            with zip_file.open(data_path) as read_file:
                 self.loadJSONData(read_file)
-        elif kml_path in namelist:
-            with zip_file.open(kml_path) as read_file:
+        elif data_path.endswith(".kml"):
+            with zip_file.open(data_path) as read_file:
                 self.loadKMLData(read_file)
         else:
             raise ValueError(
-                "{!r} does not contain {!r} or {!r}".format(file_name, json_path, kml_path))
+                "unsupported extension for {!r}: only .json and .kml supported"
+                .format(file_name)
+            )
 
     def coordUpdate(self, lat_lon):
         self.coordinates[lat_lon] += 1
@@ -119,7 +132,7 @@ class Generator:
         """
         print("Loading data from {}...".format(data_file))
         if data_file.endswith('.zip'):
-            self.load_takeout_zip_data(data_file)
+            self.load_zip_data(data_file)
         elif data_file.endswith('.json'):
             with open(data_file) as json_file:
                 self.loadJSONData(json_file)
