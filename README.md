@@ -67,7 +67,7 @@ The script will generate a HTML file named `heatmap.html`. This file will automa
 
 ## FAQ
 
-### I'm getting an "Out of Memory" or `MemoryError` error when I try to run the script. What's going on?
+### I'm getting an "Out of Memory" error or `MemoryError` when I try to run the script. What's going on?
 Your `LocationHistory.json` file is probably huge, and Python is running out of memory when the script tries to parse that file.
 
 To fix this, download and install the 64-bit version of Python. To do this:
