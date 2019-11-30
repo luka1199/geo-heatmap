@@ -22,7 +22,7 @@ On <https://github.com/luka1199/geo-heatmap>, click the green "Clone or Download
 ### 4. Install Dependencies
 In a [command prompt or Terminal window](https://tutorial.djangogirls.org/en/intro_to_command_line/#what-is-the-command-line), [navigate to the directory](https://tutorial.djangogirls.org/en/intro_to_command_line/#change-current-directory) containing this repository's files. Then, type the following, and press enter:
 
-```
+```shell
 pip install -r requirements.txt
 ```
 
