@@ -35,9 +35,26 @@ python geo_heatmap.py <file>
 ```
 Replace the string `<file>` from above with the path to any of the following files:
 
-1. the `Location History.json` JSON file from Google Takeout
-2. the `Location History.kml` KML file from Google Takeout
-3. the `takeout-*.zip` raw download from Google Takeout that contains either of the above files
+1. The `Location History.json` JSON file from Google Takeout
+2. The `Location History.kml` KML file from Google Takeout
+3. The `takeout-*.zip` raw download from Google Takeout that contains either of the above files
+
+#### Usage
+```
+usage: geo_heatmap.py [-h] [-o OUTPUT] file
+
+positional arguments:
+  file                  Any of the following files:
+                        1. Your location history JSON file from Google Takeout
+                        2. Your location history KML file from Google Takeout
+                        3. The takeout-*.zip raw download from Google Takeout
+                        that contains either of the above files
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Path of heatmap HTML output file.
+```
 
 ### 6. Review the Results
 

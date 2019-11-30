@@ -8,7 +8,7 @@
 takeout-*.zip
 
 # generated files
-heatmap.html
+*.html
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
