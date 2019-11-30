@@ -114,10 +114,12 @@ class Generator:
         (elem,) = soup.select(
             "#service-tile-LOCATION_HISTORY > button > div.service_summary > div > h1[data-english-name=LOCATION_HISTORY]")
         name = elem["data-folder-name"]
-        (data_path,) = fnmatch.filter(namelist,
-                                      "Takeout/{name}/{name}.*".format(name=name))
-        print(
-            "Reading location data file from zip archive: {!r}".format(data_path))
+        (data_path,) = fnmatch.filter(
+            namelist,
+            "Takeout/{name}/{name}.*".format(name=name))
+        print("Reading location data file from zip archive: {!r}".format(
+            data_path))
+        
         if data_path.endswith(".json"):
             with zip_file.open(data_path) as read_file:
                 self.loadJSONData(read_file, date_range)
@@ -125,10 +127,8 @@ class Generator:
             with zip_file.open(data_path) as read_file:
                 self.loadKMLData(read_file, date_range)
         else:
-            raise ValueError(
-                "unsupported extension for {!r}: only .json and .kml supported"
-                .format(file_name)
-            )
+            raise ValueError("unsupported extension for {!r}: only .json and .kml supported"
+                .format(file_name))
 
     def updateCoord(self, coords):
         self.coordinates[coords] += 1
@@ -178,6 +178,7 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
+                
         print("Generating heatmap...")
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
