@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 
 import collections
+import fnmatch
 import json
 import os
 import sys
 import webbrowser
+import zipfile
 import folium
 from folium.plugins import HeatMap
 from progressbar import ProgressBar, Bar, ETA, Percentage
+from xml.etree import ElementTree
 from xml.dom import minidom
 
 
@@ -20,33 +23,32 @@ class Generator:
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
 
-    def loadData(self, file_name):
+    def loadJSONData(self, json_file):
         """Loads the google location data from the given json file.
 
         Arguments:
-            file_name {string} -- The name of the json file with the google
-                location data.
+            json_file -- An open file-like object with JSON-encoded
+                google location data.
         """
-        with open(file_name) as json_file:
-            data = json.load(json_file)
-            w = [Bar(), Percentage(), ' ', ETA()]
-            with ProgressBar(max_value=len(data["locations"]),
-                             widgets=w) as pb:
-                for i, loc in enumerate(data["locations"]):
-                    if "latitudeE7" not in loc or "longitudeE7" not in loc:
-                        continue
-                    lat_lon = (round(loc["latitudeE7"] / 1e7, 6),
-                               round(loc["longitudeE7"] / 1e7, 6))
-                    
-                    self.coordUpdate(lat_lon)
-                    pb.update(i)
+        data = json.load(json_file)
+        w = [Bar(), Percentage(), ' ', ETA()]
+        with ProgressBar(max_value=len(data["locations"]),
+                            widgets=w) as pb:
+            for i, loc in enumerate(data["locations"]):
+                if "latitudeE7" not in loc or "longitudeE7" not in loc:
+                    continue
+                lat_lon = (round(loc["latitudeE7"] / 1e7, 6),
+                            round(loc["longitudeE7"] / 1e7, 6))
+                
+                self.coordUpdate(lat_lon)
+                pb.update(i)
 
     def loadKMLData(self, file_name):
         """Loads the google location data from the given KML file.
 
         Arguments:
-            file_name {string} -- The name of the KML file with the google 
-                location data.
+            file_name {string or file} -- The name of the KML file
+                (or an open file-like object) with the google location data.
         """
         xmldoc = minidom.parse(file_name)
         kml = xmldoc.getElementsByTagName("kml")[0]
@@ -62,6 +64,35 @@ class Generator:
 
                 self.coordUpdate(lat_lon)
                 pb.update(i)
+
+    def load_zip_data(self, file_name):
+        """
+        Load google location data from a "takeout-*.zip" file.
+        """
+        from bs4 import BeautifulSoup
+        """
+        <div class="service_name"><h1 class="data-folder-name" data-english-name="LOCATION_HISTORY" data-folder-name="Location History">Location History</h1></div>
+        """
+        zip_file = zipfile.ZipFile(file_name)
+        namelist = zip_file.namelist()
+        (html_path,) = fnmatch.filter(namelist, "Takeout/*.html")
+        with zip_file.open(html_path) as read_file:
+            soup = BeautifulSoup(read_file, "html.parser")
+        (elem,) = soup.select("#service-tile-LOCATION_HISTORY > button > div.service_summary > div > h1[data-english-name=LOCATION_HISTORY]")
+        name = elem['data-folder-name']
+        (data_path,) = fnmatch.filter(namelist, "Takeout/{name}/{name}.*".format(name=name))
+        print("Reading location data file from zip archive: {!r}".format(data_path))
+        if data_path.endswith(".json"):
+            with zip_file.open(data_path) as read_file:
+                self.loadJSONData(read_file)
+        elif data_path.endswith(".kml"):
+            with zip_file.open(data_path) as read_file:
+                self.loadKMLData(read_file)
+        else:
+            raise ValueError(
+                "unsupported extension for {!r}: only .json and .kml supported"
+                .format(file_name)
+            )
 
     def coordUpdate(self, lat_lon):
         self.coordinates[lat_lon] += 1
@@ -99,13 +130,16 @@ class Generator:
                 location data.
             output_file {string} -- The name of the output file.
         """
-
-        if(data_file.endswith('.json')):
-            print("Loading data from {}...".format(data_file))
-            self.loadData(data_file)
-        elif(data_file.endswith('.kml')):
-            print("Loading data from {}...".format(data_file))
+        print("Loading data from {}...".format(data_file))
+        if data_file.endswith('.zip'):
+            self.load_zip_data(data_file)
+        elif data_file.endswith('.json'):
+            with open(data_file) as json_file:
+                self.loadJSONData(json_file)
+        elif data_file.endswith('.kml'):
             self.loadKMLData(data_file)
+        else:
+            raise NotImplementedError("Unsupported file extension for {!r}".format(data_file))
         print("Generating heatmap...")
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
