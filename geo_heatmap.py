@@ -40,7 +40,7 @@ class Generator:
                 lat_lon = (round(loc["latitudeE7"] / 1e7, 6),
                             round(loc["longitudeE7"] / 1e7, 6))
                 
-                self.coordUpdate(lat_lon)
+                self.updateCoord(lat_lon)
                 pb.update(i)
 
     def loadKMLData(self, file_name):
@@ -62,7 +62,7 @@ class Generator:
                 loc = (number.firstChild.data).split()
                 lat_lon = (loc[1], loc[0])
 
-                self.coordUpdate(lat_lon)
+                self.updateCoord(lat_lon)
                 pb.update(i)
 
     def load_zip_data(self, file_name):
@@ -71,7 +71,11 @@ class Generator:
         """
         from bs4 import BeautifulSoup
         """
-        <div class="service_name"><h1 class="data-folder-name" data-english-name="LOCATION_HISTORY" data-folder-name="Location History">Location History</h1></div>
+        <div class="service_name">
+            <h1 class="data-folder-name" data-english-name="LOCATION_HISTORY" data-folder-name="Location History">
+                Location History
+            </h1>
+        </div>
         """
         zip_file = zipfile.ZipFile(file_name)
         namelist = zip_file.namelist()
@@ -94,7 +98,7 @@ class Generator:
                 .format(file_name)
             )
 
-    def coordUpdate(self, lat_lon):
+    def updateCoord(self, lat_lon):
         self.coordinates[lat_lon] += 1
         if self.coordinates[lat_lon] > self.max_magnitude:
             self.max_coordinates = lat_lon
@@ -122,24 +126,25 @@ class Generator:
         m.add_child(heatmap)
         return m
 
-    def run(self, data_file, output_file):
+    def run(self, data_files, output_file):
         """Load the data, generate the heatmap and save it.
 
         Arguments:
-            data_file {string} -- The name of the json file with the google
-                location data.
+            data_file {string} -- The name of the data file with the google
+                location data or the goole takeout ZIP archive.
             output_file {string} -- The name of the output file.
         """
-        print("Loading data from {}...".format(data_file))
-        if data_file.endswith(".zip"):
-            self.load_zip_data(data_file)
-        elif data_file.endswith(".json"):
-            with open(data_file) as json_file:
-                self.loadJSONData(json_file)
-        elif data_file.endswith(".kml"):
-            self.loadKMLData(data_file)
-        else:
-            raise NotImplementedError("Unsupported file extension for {!r}".format(data_file))
+        for data_file in data_files:
+            print("Loading data from {}...".format(data_file))
+            if data_file.endswith(".zip"):
+                self.load_zip_data(data_file)
+            elif data_file.endswith(".json"):
+                with open(data_file) as json_file:
+                    self.loadJSONData(json_file)
+            elif data_file.endswith(".kml"):
+                self.loadKMLData(data_file)
+            else:
+                raise NotImplementedError("Unsupported file extension for {!r}".format(data_file))
         print("Generating heatmap...")
         m = self.generateMap()
         print("Saving map to {}...".format(output_file))
@@ -165,14 +170,15 @@ def isTextBasedBrowser(browser):
 if __name__ == "__main__":
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument(
-        "file", type=str, help="Any of the following files:\n"
+        "files", metavar="file", type=str, nargs='+', help="Any of the following files:\n"
         "1. Your location history JSON file from Google Takeout\n"
         "2. Your location history KML file from Google Takeout\n"
         "3. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
     parser.add_argument("-o", "--output", dest="output", type=str, required=False,
                         help="Path of heatmap HTML output file.", default="heatmap.html")
     args = parser.parse_args()
-    data_file = args.file
+    print(args.files)
+    data_file = args.files
     output_file = args.output
 
     generator = Generator()

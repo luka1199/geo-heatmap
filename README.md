@@ -41,7 +41,7 @@ Replace the string `<file>` from above with the path to any of the following fil
 
 #### Usage
 ```
-usage: geo_heatmap.py [-h] [-o OUTPUT] file
+usage: geo_heatmap.py [-h] [-o OUTPUT] file [file ...]
 
 positional arguments:
   file                  Any of the following files:
