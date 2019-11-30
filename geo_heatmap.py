@@ -88,10 +88,9 @@ class Generator:
         with ProgressBar(max_value=len(gxtrack), widgets=w) as pb:
             for i, number in enumerate(gxtrack):
                 loc = (number.firstChild.data).split()
-                coords = (loc[1], loc[0])
+                coords = (round(float(loc[1]), 6), round(float(loc[0]), 6))
 
-                if self.timestampInRange(loc['timestampMs'], date_range):
-                    self.updateCoord(coords)
+                self.updateCoord(coords)
                 pb.update(i)
 
     def loadZIPData(self, file_name, date_range):
