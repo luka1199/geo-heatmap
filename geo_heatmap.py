@@ -12,6 +12,7 @@ from folium.plugins import HeatMap
 from progressbar import ProgressBar, Bar, ETA, Percentage
 from xml.etree import ElementTree
 from xml.dom import minidom
+from pandas import date_range
 
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
@@ -24,11 +25,11 @@ class Generator:
         self.max_magnitude = 0
 
     def loadJSONData(self, json_file):
-        """Loads the google location data from the given json file.
+        """Loads the Google location data from the given json file.
 
         Arguments:
             json_file -- An open file-like object with JSON-encoded
-                google location data.
+                Google location data.
         """
         data = json.load(json_file)
         w = [Bar(), Percentage(), " ", ETA()]
@@ -44,11 +45,11 @@ class Generator:
                 pb.update(i)
 
     def loadKMLData(self, file_name):
-        """Loads the google location data from the given KML file.
+        """Loads the Google location data from the given KML file.
 
         Arguments:
             file_name {string or file} -- The name of the KML file
-                (or an open file-like object) with the google location data.
+                (or an open file-like object) with the Google location data.
         """
         xmldoc = minidom.parse(file_name)
         kml = xmldoc.getElementsByTagName("kml")[0]
@@ -67,7 +68,7 @@ class Generator:
 
     def load_zip_data(self, file_name):
         """
-        Load google location data from a "takeout-*.zip" file.
+        Load Google location data from a "takeout-*.zip" file.
         """
         from bs4 import BeautifulSoup
         """
@@ -130,8 +131,8 @@ class Generator:
         """Load the data, generate the heatmap and save it.
 
         Arguments:
-            data_file {string} -- The name of the data file with the google
-                location data or the goole takeout ZIP archive.
+            data_files {list} -- List of names of the data files with the Google
+                location data or the Goole takeout ZIP archive.
             output_file {string} -- The name of the output file.
         """
         for data_file in data_files:
