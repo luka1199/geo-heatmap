@@ -36,7 +36,20 @@ class Generator:
             return True
         date_str = datetime.fromtimestamp(
             int(timestamp) / 1000).strftime("%Y-%m-%d")
-        date = datetime.strptime(date_str, "%Y-%m-%d")
+        
+        return self.dateInRange(date_str, date_range)
+        
+            
+    def dateInRange(self, date, date_range):
+        """Returns if the date is in the date range.
+        
+        Arguments:
+            date {str} -- A date (Format: yyyy-mm-dd).
+            date_range {tuple} -- A tuple of strings representing the date range. 
+            (min_date, max_date) (Date format: yyyy-mm-dd)
+        """
+        if date_range == (None, None):
+            return True
         if date_range[0] == None:
             min_date = None
         else:
@@ -45,7 +58,7 @@ class Generator:
             max_date = None
         else:
             max_date = datetime.strptime(date_range[1], "%Y-%m-%d")
-            
+        date = datetime.strptime(date, "%Y-%m-%d")
         return (min_date is None or min_date <= date) and \
             (max_date is None or max_date >= date)
 
@@ -79,18 +92,17 @@ class Generator:
                 (or an open file-like object) with the Google location data.
         """
         xmldoc = minidom.parse(file_name)
-        kml = xmldoc.getElementsByTagName("kml")[0]
-        document = kml.getElementsByTagName("Document")[0]
-        placemark = document.getElementsByTagName("Placemark")[0]
-        gxtrack = placemark.getElementsByTagName("gx:coord")
+        gxtrack = xmldoc.getElementsByTagName("gx:coord")
+        when = xmldoc.getElementsByTagName("when")
         w = [Bar(), Percentage(), " ", ETA()]
 
         with ProgressBar(max_value=len(gxtrack), widgets=w) as pb:
             for i, number in enumerate(gxtrack):
                 loc = (number.firstChild.data).split()
                 coords = (round(float(loc[1]), 6), round(float(loc[0]), 6))
-
-                self.updateCoord(coords)
+                date = when[i].firstChild.data
+                if self.dateInRange(date[:10], date_range):
+                    self.updateCoord(coords)
                 pb.update(i)
 
     def loadZIPData(self, file_name, date_range):
