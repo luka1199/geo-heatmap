@@ -41,7 +41,9 @@ Replace the string `<file>` from above with the path to any of the following fil
 
 #### Usage
 ```
-usage: geo_heatmap.py [-h] [-o OUTPUT] file [file ...]
+usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
+                      [--max-date YYYY-MM-DD]
+                      file [file ...]
 
 positional arguments:
   file                  Any of the following files:
@@ -52,8 +54,11 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o OUTPUT, --output OUTPUT
-                        Path of heatmap HTML output file.
+  -o , --output         Path of heatmap HTML output file.
+  --min-date YYYY-MM-DD
+                        The earliest date from which you want to see data in the heatmap.
+  --max-date YYYY-MM-DD
+                        The latest date from which you want to see data in the heatmap.
 ```
 
 ### 6. Review the Results
