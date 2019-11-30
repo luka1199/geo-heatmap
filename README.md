@@ -27,11 +27,17 @@ pip install -r requirements.txt
 ```
 
 ### 5. Run the Script
+
 In the same command prompt or Terminal window, type the following, and press enter:
-```
+
+```shell
 python geo_heatmap.py <file>
 ```
-Replace the string `<file>` from above with the path to the `LocationHistory.json` JSON file from Google Takeout.
+Replace the string `<file>` from above with the path to any of the following files:
+
+1. the `Location History.json` JSON file from Google Takeout
+2. the `Location History.kml` KML file from Google Takeout
+3. the `takeout-*.zip` raw download from Google Takeout that contains either of the above files
 
 ### 6. Review the Results
 
