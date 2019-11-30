@@ -4,7 +4,7 @@ import collections
 import fnmatch
 import json
 import os
-import sys
+from argparse import ArgumentParser, RawTextHelpFormatter
 import webbrowser
 import zipfile
 import folium
@@ -31,7 +31,7 @@ class Generator:
                 google location data.
         """
         data = json.load(json_file)
-        w = [Bar(), Percentage(), ' ', ETA()]
+        w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=len(data["locations"]),
                             widgets=w) as pb:
             for i, loc in enumerate(data["locations"]):
@@ -55,7 +55,7 @@ class Generator:
         document = kml.getElementsByTagName("Document")[0]
         placemark = document.getElementsByTagName("Placemark")[0]
         gxtrack = placemark.getElementsByTagName("gx:coord")
-        w = [Bar(), Percentage(), ' ', ETA()]
+        w = [Bar(), Percentage(), " ", ETA()]
 
         with ProgressBar(max_value=len(gxtrack), widgets=w) as pb:
             for i, number in enumerate(gxtrack):
@@ -79,7 +79,7 @@ class Generator:
         with zip_file.open(html_path) as read_file:
             soup = BeautifulSoup(read_file, "html.parser")
         (elem,) = soup.select("#service-tile-LOCATION_HISTORY > button > div.service_summary > div > h1[data-english-name=LOCATION_HISTORY]")
-        name = elem['data-folder-name']
+        name = elem["data-folder-name"]
         (data_path,) = fnmatch.filter(namelist, "Takeout/{name}/{name}.*".format(name=name))
         print("Reading location data file from zip archive: {!r}".format(data_path))
         if data_path.endswith(".json"):
@@ -131,12 +131,12 @@ class Generator:
             output_file {string} -- The name of the output file.
         """
         print("Loading data from {}...".format(data_file))
-        if data_file.endswith('.zip'):
+        if data_file.endswith(".zip"):
             self.load_zip_data(data_file)
-        elif data_file.endswith('.json'):
+        elif data_file.endswith(".json"):
             with open(data_file) as json_file:
                 self.loadJSONData(json_file)
-        elif data_file.endswith('.kml'):
+        elif data_file.endswith(".kml"):
             self.loadKMLData(data_file)
         else:
             raise NotImplementedError("Unsupported file extension for {!r}".format(data_file))
@@ -163,15 +163,21 @@ def isTextBasedBrowser(browser):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        data_file = sys.argv[1]
-        output_file = "heatmap.html"
-        generator = Generator()
-        generator.run(data_file, output_file)
-        # Check if browser is text-based
-        if not isTextBasedBrowser(webbrowser.get()):
-            print("Opening {} in browser...".format(output_file))
-            webbrowser.open('file://' + os.path.realpath(output_file))
-    else:
-        print("Usage: python geo_heatmap.py <file>")
-        sys.exit()
+    parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
+    parser.add_argument(
+        "file", type=str, help="Any of the following files:\n"
+        "1. Your location history JSON file from Google Takeout\n"
+        "2. Your location history KML file from Google Takeout\n"
+        "3. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
+    parser.add_argument("-o", "--output", dest="output", type=str, required=False,
+                        help="Path of heatmap HTML output file.", default="heatmap.html")
+    args = parser.parse_args()
+    data_file = args.file
+    output_file = args.output
+
+    generator = Generator()
+    generator.run(data_file, output_file)
+    # Check if browser is text-based
+    if not isTextBasedBrowser(webbrowser.get()):
+        print("Opening {} in browser...".format(output_file))
+        webbrowser.open("file://" + os.path.realpath(output_file))
