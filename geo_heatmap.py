@@ -96,7 +96,7 @@ class Generator:
             raise ValueError(
                 "unsupported extension for {!r}: only .json and .kml supported"
                 .format(file_name)
-            )
+                )
 
     def updateCoord(self, lat_lon):
         self.coordinates[lat_lon] += 1
@@ -174,13 +174,12 @@ if __name__ == "__main__":
         "1. Your location history JSON file from Google Takeout\n"
         "2. Your location history KML file from Google Takeout\n"
         "3. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
-    parser.add_argument("-o", "--output", dest="output", type=str, required=False,
+    parser.add_argument("-o", "--output", dest="output", metavar="", type=str, required=False,
                         help="Path of heatmap HTML output file.", default="heatmap.html")
     args = parser.parse_args()
-    print(args.files)
     data_file = args.files
     output_file = args.output
-
+    
     generator = Generator()
     generator.run(data_file, output_file)
     # Check if browser is text-based
