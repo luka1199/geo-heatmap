@@ -80,3 +80,12 @@ To fix this, download and install the 64-bit version of Python. To do this:
 
 ### I'm getting a `SyntaxError` when running `pip install -r requirements.txt` or `python geo_heatmap.py <file>`. What am I doing wrong?
 You are probably using the python interpreter to run these commands. Try to run them in cmd.exe or Windows PowerShell (Windows) or the Terminal (Linux, MacOS).
+
+### I'm getting the error message `TypeError: __init__() got an unexpected keyword argument 'max_value'`. What can I do to fix this?
+Try to run:
+
+```shell
+pip uninstall progressbar
+pip install progressbar2
+```
+You probably have progressbar installed, which uses `maxval` as an argument for `__init__`. Progressbar2 uses `max_value`.
