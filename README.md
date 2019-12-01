@@ -88,4 +88,4 @@ Try to run:
 pip uninstall progressbar
 pip install progressbar2
 ```
-You probably have progressbar installed, which uses `maxval` as an argument for `__init__`. Progressbar2 uses `max_value`.
+You probably have Progressbar installed, which uses `maxval` as an argument for `__init__`. Progressbar2 uses `max_value`.
