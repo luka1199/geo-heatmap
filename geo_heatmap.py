@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import collections
-import fnmatch
-import json
-import os
 from argparse import ArgumentParser, RawTextHelpFormatter
-import webbrowser
-import zipfile
+import collections
+from datetime import datetime
+import fnmatch
 import folium
 from folium.plugins import HeatMap
+import json
+import os
 from progressbar import ProgressBar, Bar, ETA, Percentage
+import webbrowser
 from xml.etree import ElementTree
 from xml.dom import minidom
-from datetime import datetime
+import zipfile
 
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
@@ -26,41 +26,41 @@ class Generator:
         self.map_copyrights = {
             "openstreetmap": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
             "stamen terrain": """
-                            <a href="http://maps.stamen.com/">Map tiles</a> by 
-                            <a href="http://stamen.com">Stamen Design</a>, under 
-                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. 
-                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> 
+                            <a href="http://maps.stamen.com/">Map tiles</a> by
+                            <a href="http://stamen.com">Stamen Design</a>, under
+                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.
+                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
                             contributors.""",
             "stamen toner": """
-                            <a href="http://maps.stamen.com/">Map tiles</a> by 
-                            <a href="http://stamen.com">Stamen Design</a>, under 
-                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. 
-                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> 
+                            <a href="http://maps.stamen.com/">Map tiles</a> by
+                            <a href="http://stamen.com">Stamen Design</a>, under
+                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.
+                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
                             contributors."""
         }
-        
+
     def timestampInRange(self, timestamp, date_range):
         """Returns if the timestamp is in the date range.
-        
+
         Arguments:
             timestamp {str} -- A timestamp (in ms).
-            date_range {tuple} -- A tuple of strings representing the date range. 
+            date_range {tuple} -- A tuple of strings representing the date range.
             (min_date, max_date) (Date format: yyyy-mm-dd)
         """
         if date_range == (None, None):
             return True
         date_str = datetime.fromtimestamp(
             int(timestamp) / 1000).strftime("%Y-%m-%d")
-        
+
         return self.dateInRange(date_str, date_range)
-        
-            
+
+
     def dateInRange(self, date, date_range):
         """Returns if the date is in the date range.
-        
+
         Arguments:
             date {str} -- A date (Format: yyyy-mm-dd).
-            date_range {tuple} -- A tuple of strings representing the date range. 
+            date_range {tuple} -- A tuple of strings representing the date range.
             (min_date, max_date) (Date format: yyyy-mm-dd)
         """
         if date_range == (None, None):
@@ -94,7 +94,7 @@ class Generator:
                     continue
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                            round(loc["longitudeE7"] / 1e7, 6))
-                
+
                 if self.timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
                 pb.update(i)
@@ -145,7 +145,7 @@ class Generator:
             "Takeout/{name}/{name}.*".format(name=name))
         print("Reading location data file from zip archive: {!r}".format(
             data_path))
-        
+
         if data_path.endswith(".json"):
             with zip_file.open(data_path) as read_file:
                 self.loadJSONData(read_file, date_range)
@@ -210,7 +210,7 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
-                
+
         print("Generating heatmap...")
         m = self.generateMap(tiles)
         print("Saving map to {}...".format(output_file))
@@ -255,7 +255,7 @@ if __name__ == "__main__":
     output_file = args.output
     date_range = args.min_date, args.max_date
     tiles = args.map
-    
+
     generator = Generator()
     generator.run(data_file, output_file, date_range, tiles)
     # Check if browser is text-based
