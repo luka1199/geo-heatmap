@@ -2,20 +2,16 @@
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 import collections
-from datetime import datetime
 import fnmatch
 import folium
 from folium.plugins import HeatMap
 import json
 import os
 from progressbar import ProgressBar, Bar, ETA, Percentage
-import webbrowser
+from utils import *
 from xml.etree import ElementTree
 from xml.dom import minidom
 import zipfile
-
-
-TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
 
 
 class Generator:
@@ -39,44 +35,6 @@ class Generator:
                             contributors."""
         }
 
-    def timestampInRange(self, timestamp, date_range):
-        """Returns if the timestamp is in the date range.
-
-        Arguments:
-            timestamp {str} -- A timestamp (in ms).
-            date_range {tuple} -- A tuple of strings representing the date range.
-            (min_date, max_date) (Date format: yyyy-mm-dd)
-        """
-        if date_range == (None, None):
-            return True
-        date_str = datetime.fromtimestamp(
-            int(timestamp) / 1000).strftime("%Y-%m-%d")
-
-        return self.dateInRange(date_str, date_range)
-
-
-    def dateInRange(self, date, date_range):
-        """Returns if the date is in the date range.
-
-        Arguments:
-            date {str} -- A date (Format: yyyy-mm-dd).
-            date_range {tuple} -- A tuple of strings representing the date range.
-            (min_date, max_date) (Date format: yyyy-mm-dd)
-        """
-        if date_range == (None, None):
-            return True
-        if date_range[0] == None:
-            min_date = None
-        else:
-            min_date = datetime.strptime(date_range[0], "%Y-%m-%d")
-        if date_range[1] == None:
-            max_date = None
-        else:
-            max_date = datetime.strptime(date_range[1], "%Y-%m-%d")
-        date = datetime.strptime(date, "%Y-%m-%d")
-        return (min_date is None or min_date <= date) and \
-            (max_date is None or max_date >= date)
-
 
     def loadJSONData(self, json_file, date_range):
         """Loads the Google location data from the given json file.
@@ -94,7 +52,7 @@ class Generator:
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                            round(loc["longitudeE7"] / 1e7, 6))
 
-                if self.timestampInRange(loc['timestampMs'], date_range):
+                if timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
                 pb.update(i)
 
@@ -115,7 +73,7 @@ class Generator:
                 loc = (number.firstChild.data).split()
                 coords = (round(float(loc[1]), 6), round(float(loc[0]), 6))
                 date = when[i].firstChild.data
-                if self.dateInRange(date[:10], date_range):
+                if dateInRange(date[:10], date_range):
                     self.updateCoord(coords)
                 pb.update(i)
 
@@ -212,39 +170,16 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
-<<<<<<< HEAD
                 
         print("({}/{}) Generating heatmap".format(
             len(data_files) + 1, 
             len(data_files) + 2))
-        m = self.generateMap()
+        m = self.generateMap(tiles)
         print("({}/{}) Saving map to {}".format(
             len(data_files) + 2,
             len(data_files) + 2,
             output_file))
-=======
-
-        print("Generating heatmap...")
-        m = self.generateMap(tiles)
-        print("Saving map to {}...".format(output_file))
->>>>>>> ec52420ff2f1b95ed9d6aa95e89f3851cce29a02
         m.save(output_file)
-
-
-def isTextBasedBrowser(browser):
-    """Returns if browser is a text-based browser.
-
-    Arguments:
-        browser {webbrowser.BaseBrowser} -- A browser.
-
-    Returns:
-        bool -- True if browser is text-based, False if browser is not
-            text-based.
-    """
-    for tb_browser in TEXT_BASED_BROWSERS:
-        if type(browser) is tb_browser:
-            return True
-    return False
 
 
 if __name__ == "__main__":
