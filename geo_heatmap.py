@@ -156,7 +156,7 @@ class Generator:
             output_file {string} -- The name of the output file.
         """
         for i, data_file in enumerate(data_files):
-            print("({}/{}) Loading data from {}".format(
+            print("\n({}/{}) Loading data from {}".format(
                 i + 1, 
                 len(data_files) + 2, 
                 data_file))
@@ -171,11 +171,11 @@ class Generator:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
                 
-        print("({}/{}) Generating heatmap".format(
+        print("\n({}/{}) Generating heatmap".format(
             len(data_files) + 1, 
             len(data_files) + 2))
         m = self.generateMap(tiles)
-        print("({}/{}) Saving map to {}".format(
+        print("\n({}/{}) Saving map to {}\n".format(
             len(data_files) + 2,
             len(data_files) + 2,
             output_file))
