@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import collections
-import fnmatch
-import json
-import os
 from argparse import ArgumentParser, RawTextHelpFormatter
-import webbrowser
-import zipfile
+import collections
+from datetime import datetime
+import fnmatch
 import folium
 from folium.plugins import HeatMap
+import json
+import os
 from progressbar import ProgressBar, Bar, ETA, Percentage
+import webbrowser
 from xml.etree import ElementTree
 from xml.dom import minidom
-from datetime import datetime
+import zipfile
 
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
@@ -23,29 +23,44 @@ class Generator:
         self.coordinates = collections.defaultdict(int)
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
-        
+        self.map_copyrights = {
+            "openstreetmap": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
+            "stamen terrain": """
+                            <a href="http://maps.stamen.com/">Map tiles</a> by
+                            <a href="http://stamen.com">Stamen Design</a>, under
+                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.
+                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
+                            contributors.""",
+            "stamen toner": """
+                            <a href="http://maps.stamen.com/">Map tiles</a> by
+                            <a href="http://stamen.com">Stamen Design</a>, under
+                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.
+                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
+                            contributors."""
+        }
+
     def timestampInRange(self, timestamp, date_range):
         """Returns if the timestamp is in the date range.
-        
+
         Arguments:
             timestamp {str} -- A timestamp (in ms).
-            date_range {tuple} -- A tuple of strings representing the date range. 
+            date_range {tuple} -- A tuple of strings representing the date range.
             (min_date, max_date) (Date format: yyyy-mm-dd)
         """
         if date_range == (None, None):
             return True
         date_str = datetime.fromtimestamp(
             int(timestamp) / 1000).strftime("%Y-%m-%d")
-        
+
         return self.dateInRange(date_str, date_range)
-        
-            
+
+
     def dateInRange(self, date, date_range):
         """Returns if the date is in the date range.
-        
+
         Arguments:
             date {str} -- A date (Format: yyyy-mm-dd).
-            date_range {tuple} -- A tuple of strings representing the date range. 
+            date_range {tuple} -- A tuple of strings representing the date range.
             (min_date, max_date) (Date format: yyyy-mm-dd)
         """
         if date_range == (None, None):
@@ -78,7 +93,7 @@ class Generator:
                     continue
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                            round(loc["longitudeE7"] / 1e7, 6))
-                
+
                 if self.timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
                 pb.update(i)
@@ -129,7 +144,7 @@ class Generator:
             "Takeout/{name}/{name}.*".format(name=name))
         print("Reading location data file from zip archive: {!r}".format(
             data_path))
-        
+
         if data_path.endswith(".json"):
             with zip_file.open(data_path) as read_file:
                 self.loadJSONData(read_file, date_range)
@@ -146,7 +161,12 @@ class Generator:
             self.max_coordinates = coords
             self.max_magnitude = self.coordinates[coords]
 
-    def generateMap(self, map_zoom_start=6, heatmap_radius=7,
+    def getMapCopyright(self, name):
+        if name.lower() in self.map_copyrights:
+            return self.map_copyrights[name.lower()]
+        return None
+
+    def generateMap(self, tiles, map_zoom_start=6, heatmap_radius=7,
                     heatmap_blur=4, heatmap_min_opacity=0.2,
                     heatmap_max_zoom=4):
         map_data = [(coords[0], coords[1], magnitude)
@@ -155,7 +175,8 @@ class Generator:
         # Generate map
         m = folium.Map(location=self.max_coordinates,
                        zoom_start=map_zoom_start,
-                       tiles="OpenStreetMap")
+                       tiles=tiles,
+                       attr=self.getMapCopyright(tiles))
 
         # Generate heat map
         heatmap = HeatMap(map_data,
@@ -168,7 +189,7 @@ class Generator:
         m.add_child(heatmap)
         return m
 
-    def run(self, data_files, output_file, date_range):
+    def run(self, data_files, output_file, date_range, tiles):
         """Load the data, generate the heatmap and save it.
 
         Arguments:
@@ -191,6 +212,7 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
+<<<<<<< HEAD
                 
         print("({}/{}) Generating heatmap".format(
             len(data_files) + 1, 
@@ -200,6 +222,12 @@ class Generator:
             len(data_files) + 2,
             len(data_files) + 2,
             output_file))
+=======
+
+        print("Generating heatmap...")
+        m = self.generateMap(tiles)
+        print("Saving map to {}...".format(output_file))
+>>>>>>> ec52420ff2f1b95ed9d6aa95e89f3851cce29a02
         m.save(output_file)
 
 
@@ -232,13 +260,18 @@ if __name__ == "__main__":
                         help="The earliest date from which you want to see data in the heatmap.")
     parser.add_argument("--max-date", dest="max_date", metavar="YYYY-MM-DD", type=str, required=False,
                         help="The latest date from which you want to see data in the heatmap.")
+    parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
+                        help="The name of the map tiles you want to use.\n" \
+                        "(e.g. 'OpenStreetMap', 'Stamen Terrain', 'Stamen Toner')")
+
     args = parser.parse_args()
     data_file = args.files
     output_file = args.output
     date_range = args.min_date, args.max_date
-    
+    tiles = args.map
+
     generator = Generator()
-    generator.run(data_file, output_file, date_range)
+    generator.run(data_file, output_file, date_range, tiles)
     # Check if browser is text-based
     if not isTextBasedBrowser(webbrowser.get()):
         print("[info] Opening {} in browser".format(output_file))

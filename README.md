@@ -1,8 +1,7 @@
 # Geo Heatmap
+<p align="center"><img src="https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png" alt="screenshot" width="400"></p>
 
 This is a script that generates an interactive geo heatmap from your Google location history data using Python, Folium and OpenStreetMap.
-
-<p align="center"><img src="https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png" alt="screenshot" width="400"></p>
 
 ## Getting Started
 
@@ -42,14 +41,14 @@ Replace the string `<file>` from above with the path to any of the following fil
 #### Usage
 ```
 usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
-                      [--max-date YYYY-MM-DD]
+                      [--max-date YYYY-MM-DD] [--map MAP]
                       file [file ...]
 
 positional arguments:
   file                  Any of the following files:
                         1. Your location history JSON file from Google Takeout
                         2. Your location history KML file from Google Takeout
-                        3. The takeout-*.zip raw download from Google Takeout
+                        3. The takeout-*.zip raw download from Google Takeout 
                         that contains either of the above files
 
 optional arguments:
@@ -59,6 +58,8 @@ optional arguments:
                         The earliest date from which you want to see data in the heatmap.
   --max-date YYYY-MM-DD
                         The latest date from which you want to see data in the heatmap.
+  --map MAP, -m MAP     The name of the map tiles you want to use.
+                        (e.g. 'OpenStreetMap', 'Stamen Terrain', 'Stamen Toner')
 ```
 
 ### 6. Review the Results
@@ -80,3 +81,12 @@ To fix this, download and install the 64-bit version of Python. To do this:
 
 ### I'm getting a `SyntaxError` when running `pip install -r requirements.txt` or `python geo_heatmap.py <file>`. What am I doing wrong?
 You are probably using the python interpreter to run these commands. Try to run them in cmd.exe or Windows PowerShell (Windows) or the Terminal (Linux, MacOS).
+
+### I'm getting the error message `TypeError: __init__() got an unexpected keyword argument 'max_value'`. What can I do to fix this?
+Try to run:
+
+```shell
+pip uninstall progressbar
+pip install progressbar2
+```
+You probably have progressbar installed, which uses `maxval` as an argument for `__init__`. Progressbar2 uses `max_value`.
