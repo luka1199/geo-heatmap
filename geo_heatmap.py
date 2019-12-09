@@ -72,8 +72,7 @@ class Generator:
         """
         data = json.load(json_file)
         w = [Bar(), Percentage(), " ", ETA()]
-        with ProgressBar(max_value=len(data["locations"]),
-                         widgets=w) as pb:
+        with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
             for i, loc in enumerate(data["locations"]):
                 if "latitudeE7" not in loc or "longitudeE7" not in loc:
                     continue
@@ -177,8 +176,11 @@ class Generator:
                 location data or the Goole takeout ZIP archive.
             output_file {string} -- The name of the output file.
         """
-        for data_file in data_files:
-            print("Loading data from {}...".format(data_file))
+        for i, data_file in enumerate(data_files):
+            print("({}/{}) Loading data from {}".format(
+                i + 1, 
+                len(data_files) + 2, 
+                data_file))
             if data_file.endswith(".zip"):
                 self.loadZIPData(data_file, date_range)
             elif data_file.endswith(".json"):
@@ -190,9 +192,14 @@ class Generator:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
                 
-        print("Generating heatmap...")
+        print("({}/{}) Generating heatmap".format(
+            len(data_files) + 1, 
+            len(data_files) + 2))
         m = self.generateMap()
-        print("Saving map to {}...".format(output_file))
+        print("({}/{}) Saving map to {}".format(
+            len(data_files) + 2,
+            len(data_files) + 2,
+            output_file))
         m.save(output_file)
 
 
@@ -234,5 +241,5 @@ if __name__ == "__main__":
     generator.run(data_file, output_file, date_range)
     # Check if browser is text-based
     if not isTextBasedBrowser(webbrowser.get()):
-        print("Opening {} in browser...".format(output_file))
+        print("[info] Opening {} in browser".format(output_file))
         webbrowser.open("file://" + os.path.realpath(output_file))
