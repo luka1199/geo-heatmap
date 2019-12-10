@@ -5,6 +5,7 @@ import collections
 import fnmatch
 import folium
 from folium.plugins import HeatMap
+import ijson
 import json
 import os
 from progressbar import ProgressBar, Bar, ETA, Percentage
@@ -40,8 +41,10 @@ class Generator:
         """Loads the Google location data from the given json file.
 
         Arguments:
-            json_file -- An open file-like object with JSON-encoded
+            json_file {file} -- An open file-like object with JSON-encoded
                 Google location data.
+            date_range {tuple} -- A tuple containing the min-date and max-date.
+                e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
         """
         data = json.load(json_file)
         w = [Bar(), Percentage(), " ", ETA()]
@@ -56,12 +59,33 @@ class Generator:
                     self.updateCoord(coords)
                 pb.update(i)
 
+    def streamJSONData(self, json_file, date_range):
+        """Stream the Google location data from the given json file.
+        
+        Arguments:
+            json_file {file} -- An open file-like object with JSON-encoded
+                Google location data.
+            date_range {tuple} -- A tuple containing the min-date and max-date.
+                e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
+        """
+        locations = ijson.items(json_file, "locations.item")
+        for i, loc in enumerate(locations):
+            if "latitudeE7" not in loc or "longitudeE7" not in loc:
+                continue
+            coords = (round(loc["latitudeE7"] / 1e7, 6),
+                        round(loc["longitudeE7"] / 1e7, 6))
+
+            if timestampInRange(loc['timestampMs'], date_range):
+                self.updateCoord(coords)
+
     def loadKMLData(self, file_name, date_range):
         """Loads the Google location data from the given KML file.
 
         Arguments:
             file_name {string or file} -- The name of the KML file
                 (or an open file-like object) with the Google location data.
+            date_range {tuple} -- A tuple containing the min-date and max-date.
+                e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
         """
         xmldoc = minidom.parse(file_name)
         gxtrack = xmldoc.getElementsByTagName("gx:coord")
@@ -147,7 +171,7 @@ class Generator:
         m.add_child(heatmap)
         return m
 
-    def run(self, data_files, output_file, date_range, tiles):
+    def run(self, data_files, output_file, date_range, stream_data, tiles):
         """Load the data, generate the heatmap and save it.
 
         Arguments:
@@ -164,7 +188,10 @@ class Generator:
                 self.loadZIPData(data_file, date_range)
             elif data_file.endswith(".json"):
                 with open(data_file) as json_file:
-                    self.loadJSONData(json_file, date_range)
+                    if stream_data:
+                        self.streamJSONData(json_file, date_range)
+                    else:
+                        self.loadJSONData(json_file, date_range)
             elif data_file.endswith(".kml"):
                 self.loadKMLData(data_file, date_range)
             else:
@@ -195,6 +222,7 @@ if __name__ == "__main__":
                         help="The earliest date from which you want to see data in the heatmap.")
     parser.add_argument("--max-date", dest="max_date", metavar="YYYY-MM-DD", type=str, required=False,
                         help="The latest date from which you want to see data in the heatmap.")
+    parser.add_argument("-s", "--stream", dest="stream", action="store_true", help="Option to iterativly load data.")
     parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
                         help="The name of the map tiles you want to use.\n" \
                         "(e.g. 'OpenStreetMap', 'Stamen Terrain', 'Stamen Toner')")
@@ -204,9 +232,10 @@ if __name__ == "__main__":
     output_file = args.output
     date_range = args.min_date, args.max_date
     tiles = args.map
+    stream_data = args.stream
 
     generator = Generator()
-    generator.run(data_file, output_file, date_range, tiles)
+    generator.run(data_file, output_file, date_range, stream_data, tiles)
     # Check if browser is text-based
     if not isTextBasedBrowser(webbrowser.get()):
         print("[info] Opening {} in browser".format(output_file))
