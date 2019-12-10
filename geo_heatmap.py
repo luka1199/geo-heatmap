@@ -68,15 +68,22 @@ class Generator:
             date_range {tuple} -- A tuple containing the min-date and max-date.
                 e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
         """
+        # Estimate location amount
+        max_value_est = sum(1 for line in json_file) / 13.1
+        json_file.seek(0)
+        
         locations = ijson.items(json_file, "locations.item")
-        for i, loc in enumerate(locations):
-            if "latitudeE7" not in loc or "longitudeE7" not in loc:
-                continue
-            coords = (round(loc["latitudeE7"] / 1e7, 6),
-                        round(loc["longitudeE7"] / 1e7, 6))
+        w = [Bar(), Percentage(), " ", ETA()]
+        with ProgressBar(max_value=max_value_est, widgets=w) as pb:
+            for i, loc in enumerate(locations):
+                if "latitudeE7" not in loc or "longitudeE7" not in loc:
+                    continue
+                coords = (round(loc["latitudeE7"] / 1e7, 6),
+                            round(loc["longitudeE7"] / 1e7, 6))
 
-            if timestampInRange(loc['timestampMs'], date_range):
-                self.updateCoord(coords)
+                if timestampInRange(loc['timestampMs'], date_range):
+                    self.updateCoord(coords)
+                pb.update(i)
 
     def loadKMLData(self, file_name, date_range):
         """Loads the Google location data from the given KML file.
