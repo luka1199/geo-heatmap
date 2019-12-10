@@ -2,3 +2,4 @@ beautifulsoup4
 folium
 progressbar2
 argparse
+ijson

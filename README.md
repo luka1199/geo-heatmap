@@ -41,7 +41,7 @@ Replace the string `<file>` from above with the path to any of the following fil
 #### Usage
 ```
 usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
-                      [--max-date YYYY-MM-DD] [--map MAP]
+                      [--max-date YYYY-MM-DD] [-s] [--map MAP]
                       file [file ...]
 
 positional arguments:
@@ -58,6 +58,7 @@ optional arguments:
                         The earliest date from which you want to see data in the heatmap.
   --max-date YYYY-MM-DD
                         The latest date from which you want to see data in the heatmap.
+  -s, --stream          Option to iterativly load data.
   --map MAP, -m MAP     The name of the map tiles you want to use.
                         (e.g. 'OpenStreetMap', 'Stamen Terrain', 'Stamen Toner')
 ```
