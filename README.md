@@ -52,6 +52,10 @@ python geo_heatmap.py C:\Users\Testuser\Desktop\locations.json
 ```
 
 ```shell
+python geo_heatmap.py "C:\Users\Testuser\Desktop\Location History.json"
+```
+
+```shell
 python geo_heatmap.py locations.json
 ```
 
