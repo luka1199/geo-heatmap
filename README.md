@@ -6,6 +6,12 @@ This is a script that generates an interactive geo heatmap from your Google loca
 
 ## Getting Started
 
+[![Run on Repl.it](https://repl.it/badge/github/luka1199/geo-heatmap)](https://repl.it/github/luka1199/geo-heatmap) 
+
+Repl runs on default with -h argument. Edit with your own file.
+
+For local install:
+
 ### 1. Install Python 3+
 
 If you don't already have Python 3+ installed, grab it from <https://www.python.org/downloads/>. You'll want to download install the latest version of **Python 3.x**. As of 2019-11-22, that is Version 3.8.
