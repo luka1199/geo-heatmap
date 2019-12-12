@@ -48,6 +48,10 @@ Replace the string `<file>` from above with the path to any of the following fil
 Single file:
 
 ```shell
+python geo_heatmap.py C:\Users\Testuser\Desktop\locations.json
+```
+
+```shell
 python geo_heatmap.py locations.json
 ```
 
