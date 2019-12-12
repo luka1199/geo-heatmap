@@ -69,7 +69,7 @@ class Generator:
                 e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
         """
         # Estimate location amount
-        max_value_est = sum(1 for line in json_file) / 13.1
+        max_value_est = sum(1 for line in json_file) / 13
         json_file.seek(0)
         
         locations = ijson.items(json_file, "locations.item")
@@ -83,6 +83,10 @@ class Generator:
 
                 if timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
+                    
+                if i > max_value_est:
+                    max_value_est = i
+                    pb.max_value = i
                 pb.update(i)
 
     def loadKMLData(self, file_name, date_range):
