@@ -73,7 +73,7 @@ Set a date range:
 python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
 ```
 
-#### Usage
+#### Usage:
 
 ```
 usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
