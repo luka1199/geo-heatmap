@@ -119,10 +119,14 @@ Yes! Run the script like this:
 python geo_heatmap.py <file1> <file2> <file3> ...
 ```
 
-Example:
+Examples:
 
 ```bash
 python geo_heatmap.py locations1.json locations2.json
+```
+
+```bash
+python geo_heatmap.py locations.json locations.kml takeout.zip
 ```
 
 You can add as many files as you want.
