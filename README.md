@@ -34,7 +34,7 @@ pip install -r requirements.txt
 In the same command prompt or Terminal window, type the following, and press enter:
 
 ```shell
-python geo_heatmap.py <file>
+python geo_heatmap.py <file> [<file> ...]
 ```
 
 Replace the string `<file>` from above with the path to any of the following files:
@@ -42,6 +42,32 @@ Replace the string `<file>` from above with the path to any of the following fil
 1. The `Location History.json` JSON file from Google Takeout
 2. The `Location History.kml` KML file from Google Takeout
 3. The `takeout-*.zip` raw download from Google Takeout that contains either of the above files
+
+#### Examples:
+
+Single file:
+
+```shell
+python geo_heatmap.py locations.json
+```
+
+Multiple files:
+
+```shell
+python geo_heatmap.py locations.json locations.kml takeout.zip
+```
+
+Using the stream option (for users with Memory Errors):
+
+```shell
+python geo_heatmap.py -s locations.json
+```
+
+Set a date range:
+
+```shell
+python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
+```
 
 #### Usage
 
@@ -110,23 +136,3 @@ pip install progressbar2
 ```
 
 You probably have progressbar installed, which uses `maxval` as an argument for `__init__`. Progressbar2 uses `max_value`.
-
-### Is there a way to load multiple location data files into one heatmap?
-
-Yes! Run the script like this:
-
-```bash
-python geo_heatmap.py <file1> <file2> <file3> ...
-```
-
-Examples:
-
-```bash
-python geo_heatmap.py locations1.json locations2.json
-```
-
-```bash
-python geo_heatmap.py locations.json locations.kml takeout.zip
-```
-
-You can add as many files as you want.
