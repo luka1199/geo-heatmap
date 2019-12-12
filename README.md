@@ -110,3 +110,19 @@ pip install progressbar2
 ```
 
 You probably have progressbar installed, which uses `maxval` as an argument for `__init__`. Progressbar2 uses `max_value`.
+
+### Is there a way to load multiple location data files into one heatmap?
+
+Yes! Run the script like this:
+
+```bash
+python geo_heatmap.py <file1> <file2> <file3> ...
+```
+
+Example:
+
+```bash
+python geo_heatmap.py locations1.json locations2.json
+```
+
+You can add as many files as you want.
