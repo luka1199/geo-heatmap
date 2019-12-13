@@ -53,7 +53,7 @@ class Generator:
                 if "latitudeE7" not in loc or "longitudeE7" not in loc:
                     continue
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
-                           round(loc["longitudeE7"] / 1e7, 6))
+                          round(loc["longitudeE7"] / 1e7, 6))
 
                 if timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
@@ -61,7 +61,7 @@ class Generator:
 
     def streamJSONData(self, json_file, date_range):
         """Stream the Google location data from the given json file.
-        
+
         Arguments:
             json_file {file} -- An open file-like object with JSON-encoded
                 Google location data.
@@ -71,7 +71,7 @@ class Generator:
         # Estimate location amount
         max_value_est = sum(1 for line in json_file) / 13
         json_file.seek(0)
-        
+
         locations = ijson.items(json_file, "locations.item")
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=max_value_est, widgets=w) as pb:
@@ -83,7 +83,7 @@ class Generator:
 
                 if timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
-                    
+
                 if i > max_value_est:
                     max_value_est = i
                     pb.max_value = i
@@ -192,8 +192,8 @@ class Generator:
         """
         for i, data_file in enumerate(data_files):
             print("\n({}/{}) Loading data from {}".format(
-                i + 1, 
-                len(data_files) + 2, 
+                i + 1,
+                len(data_files) + 2,
                 data_file))
             if data_file.endswith(".zip"):
                 self.loadZIPData(data_file, date_range)
@@ -208,9 +208,9 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
-                
+
         print("\n({}/{}) Generating heatmap".format(
-            len(data_files) + 1, 
+            len(data_files) + 1,
             len(data_files) + 2))
         m = self.generateMap(tiles)
         print("\n({}/{}) Saving map to {}\n".format(
