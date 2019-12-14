@@ -247,7 +247,16 @@ if __name__ == "__main__":
 
     generator = Generator()
     generator.run(data_file, output_file, date_range, stream_data, tiles)
-    # Check if browser is text-based
-    if not isTextBasedBrowser(webbrowser.get()):
-        print("[info] Opening {} in browser".format(output_file))
-        webbrowser.open("file://" + os.path.realpath(output_file))
+
+    try:
+        browser = webbrowser.get()
+
+        # Check if browser is text-based
+        if not isTextBasedBrowser(browser):
+            print("[info] Opening {} in browser".format(output_file))
+            webbrowser.open("file://" + os.path.realpath(output_file))
+    except webbrowser.Error as e:
+        print(
+            "[warn] Could not open a browser. However, the heatmap file was generated "
+            "correctly and needs to be opened manually."
+        )

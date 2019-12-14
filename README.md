@@ -107,6 +107,19 @@ optional arguments:
 
 The script will generate a HTML file named `heatmap.html`. This file will automatically open in your browser once the script completes. Enjoy!
 
+## Running with Docker
+
+With Docker this script can be executed without the need for installing any dependencies. 
+
+Assume that the Google takeout archive is located here: `/some/path/takeout.zip`. Run the following
+Docker command to generate a `heatmap.html` file under `/some/path/`:
+
+```bash
+$ docker run --rm -v /some/path/:/data melkamar/geo-heatmapa /data/takeout.zip
+```
+
+For your case, you will want to customize the `/some/path` and `takeout.zip`.
+
 ## FAQ
 
 ### I'm getting an "Out of Memory" error or `MemoryError` when I try to run the script. What's going on?
