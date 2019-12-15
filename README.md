@@ -88,7 +88,7 @@ positional arguments:
   file                  Any of the following files:
                         1. Your location history JSON file from Google Takeout
                         2. Your location history KML file from Google Takeout
-                        3. The takeout-*.zip raw download from Google Takeout 
+                        3. The takeout-*.zip raw download from Google Takeout
                         that contains either of the above files
 
 optional arguments:
@@ -100,7 +100,7 @@ optional arguments:
                         The latest date from which you want to see data in the heatmap.
   -s, --stream          Option to iteratively load data.
   --map MAP, -m MAP     The name of the map tiles you want to use.
-                        (e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner')
+                        (e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')
 ```
 
 ### 6. Review the Results
