@@ -1,6 +1,6 @@
 # Geo Heatmap
 
-<p align="center"><img src="https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png" alt="screenshot" width="400"></p>
+![screenshot](https://user-images.githubusercontent.com/45404400/63515170-7a9cd280-c4ea-11e9-8875-e693622ac26e.png)
 
 This is a script that generates an interactive geo heatmap from your Google location history data using Python, Folium and OpenStreetMap.
 
@@ -10,12 +10,14 @@ This is a script that generates an interactive geo heatmap from your Google loca
 
 If you don't already have Python 3+ installed, grab it from <https://www.python.org/downloads/>. You'll want to download install the latest version of **Python 3.x**. As of 2019-11-22, that is Version 3.8.
 
+For ease of python version handling, I'd recommend installing it through [pyenv](https://github.com/pyenv/pyenv#installation).
+
 ### 2. Get Your Location Data
 
 Here you can find out how to download your Google data: <https://support.google.com/accounts/answer/3024190?hl=en></br>
 Here you can download all of the data that Google has stored on you: <https://takeout.google.com/>
 
-To use this script, you only need to select and download your "Location History", which Google will provide to you as a JSON file by default.  KML is also an output option and is accepted for this program.
+To use this script, you only need to select and download your "Location History", which Google will provide to you as a JSON file by default. KML is also an output option and is accepted for this program.
 
 ### 3. Clone This Repository
 
@@ -23,10 +25,12 @@ On <https://github.com/luka1199/geo-heatmap>, click the green "Clone or Download
 
 ### 4. Install Dependencies
 
+This project is using [Poetry](https://python-poetry.org/) to manage dependencies. You can install it by following their guide.
+
 In a [command prompt or Terminal window](https://tutorial.djangogirls.org/en/intro_to_command_line/#what-is-the-command-line), [navigate to the directory](https://tutorial.djangogirls.org/en/intro_to_command_line/#change-current-directory) containing this repository's files. Then, type the following, and press enter:
 
 ```shell
-pip install -r requirements.txt
+poetry install
 ```
 
 ### 5. Run the Script
@@ -34,7 +38,7 @@ pip install -r requirements.txt
 In the same command prompt or Terminal window, type the following, and press enter:
 
 ```shell
-python geo_heatmap.py <file> [<file> ...]
+poetry run python geo_heatmap.py <file> [<file> ...]
 ```
 
 Replace the string `<file>` from above with the path to any of the following files:
@@ -48,33 +52,33 @@ Replace the string `<file>` from above with the path to any of the following fil
 Single file:
 
 ```shell
-python geo_heatmap.py C:\Users\Testuser\Desktop\locations.json
+poetry run python geo_heatmap.py C:\Users\Testuser\Desktop\locations.json
 ```
 
 ```shell
-python geo_heatmap.py "C:\Users\Testuser\Desktop\Location History.json"
+poetry run python geo_heatmap.py "C:\Users\Testuser\Desktop\Location History.json"
 ```
 
 ```shell
-python geo_heatmap.py locations.json
+poetry run python geo_heatmap.py locations.json
 ```
 
 Multiple files:
 
 ```shell
-python geo_heatmap.py locations.json locations.kml takeout.zip
+poetry run python geo_heatmap.py locations.json locations.kml takeout.zip
 ```
 
 Using the stream option (for users with Memory Errors):
 
 ```shell
-python geo_heatmap.py -s locations.json
+poetry run python geo_heatmap.py -s locations.json
 ```
 
 Set a date range:
 
 ```shell
-python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
+poetry run python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
 ```
 
 #### Usage:
@@ -125,7 +129,7 @@ To fix this, download and install the 64-bit version of Python. To do this:
 If this does not fix the issue you can use the stream option:
 
 ```shell
-python geo_heatmap.py -s <file>
+poetry run python geo_heatmap.py -s <file>
 ```
 
 This will be slower but will use much less memory to load your location data.
