@@ -10,6 +10,7 @@ import json
 import os
 from progressbar import ProgressBar, Bar, ETA, Percentage
 from utils import *
+import webbrowser
 from xml.etree import ElementTree
 from xml.dom import minidom
 import zipfile
@@ -20,22 +21,6 @@ class Generator:
         self.coordinates = collections.defaultdict(int)
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
-        self.map_copyrights = {
-            "openstreetmap": "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-            "stamen terrain": """
-                            <a href="http://maps.stamen.com/">Map tiles</a> by
-                            <a href="http://stamen.com">Stamen Design</a>, under
-                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.
-                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
-                            contributors.""",
-            "stamen toner": """
-                            <a href="http://maps.stamen.com/">Map tiles</a> by
-                            <a href="http://stamen.com">Stamen Design</a>, under
-                            <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.
-                            Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>
-                            contributors."""
-        }
-
 
     def loadJSONData(self, json_file, date_range):
         """Loads the Google location data from the given json file.
@@ -154,11 +139,6 @@ class Generator:
             self.max_coordinates = coords
             self.max_magnitude = self.coordinates[coords]
 
-    def getMapCopyright(self, name):
-        if name.lower() in self.map_copyrights:
-            return self.map_copyrights[name.lower()]
-        return None
-
     def generateMap(self, tiles, map_zoom_start=6, heatmap_radius=7,
                     heatmap_blur=4, heatmap_min_opacity=0.2,
                     heatmap_max_zoom=4):
@@ -168,8 +148,7 @@ class Generator:
         # Generate map
         m = folium.Map(location=self.max_coordinates,
                        zoom_start=map_zoom_start,
-                       tiles=tiles,
-                       attr=self.getMapCopyright(tiles))
+                       tiles=tiles)
 
         # Generate heat map
         heatmap = HeatMap(map_data,
@@ -236,7 +215,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--stream", dest="stream", action="store_true", help="Option to iterativly load data.")
     parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
                         help="The name of the map tiles you want to use.\n" \
-                        "(e.g. 'OpenStreetMap', 'Stamen Terrain', 'Stamen Toner')")
+                        "(e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')")
 
     args = parser.parse_args()
     data_file = args.files
@@ -249,5 +228,10 @@ if __name__ == "__main__":
     generator.run(data_file, output_file, date_range, stream_data, tiles)
     # Check if browser is text-based
     if not isTextBasedBrowser(webbrowser.get()):
-        print("[info] Opening {} in browser".format(output_file))
-        webbrowser.open("file://" + os.path.realpath(output_file))
+        try:
+            print("[info] Opening {} in browser".format(output_file))
+            webbrowser.open("file://" + os.path.realpath(output_file))
+        except webbrowser.Error:
+            print("[info] No runnable browser found. Open {} manually.".format(
+                output_file))
+            print("[info] Path to heatmap file: \"{}\"".format(os.path.abspath(output_file)))
