@@ -166,7 +166,7 @@ class Generator:
 
         Arguments:
             data_files {list} -- List of names of the data files with the Google
-                location data or the Goole takeout ZIP archive.
+                location data or the Google takeout ZIP archive.
             output_file {string} -- The name of the output file.
         """
         for i, data_file in enumerate(data_files):
@@ -212,7 +212,7 @@ if __name__ == "__main__":
                         help="The earliest date from which you want to see data in the heatmap.")
     parser.add_argument("--max-date", dest="max_date", metavar="YYYY-MM-DD", type=str, required=False,
                         help="The latest date from which you want to see data in the heatmap.")
-    parser.add_argument("-s", "--stream", dest="stream", action="store_true", help="Option to iterativly load data.")
+    parser.add_argument("-s", "--stream", dest="stream", action="store_true", help="Option to iteratively load data.")
     parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
                         help="The name of the map tiles you want to use.\n" \
                         "(e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')")

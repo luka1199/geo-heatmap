@@ -98,9 +98,9 @@ optional arguments:
                         The earliest date from which you want to see data in the heatmap.
   --max-date YYYY-MM-DD
                         The latest date from which you want to see data in the heatmap.
-  -s, --stream          Option to iterativly load data.
+  -s, --stream          Option to iteratively load data.
   --map MAP, -m MAP     The name of the map tiles you want to use.
-                        (e.g. 'OpenStreetMap', 'Stamen Terrain', 'Stamen Toner')
+                        (e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner')
 ```
 
 ### 6. Review the Results
