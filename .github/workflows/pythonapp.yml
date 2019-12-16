@@ -1,0 +1,22 @@
+name: Will it build?
+
+on: push
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install
+        uses: abatilo/actions-poetry@v1.1.0
+        with:
+          python_version: 3.8.0
+          poetry_version: 1.0.0
+          args: install
+      - name: Run build
+        uses: abatilo/actions-poetry@v1.1.0
+        with:
+          python_version: 3.8.0
+          poetry_version: 1.0.0
+          args: build

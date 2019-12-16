@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "geo-heatmap"
-version = "0.1.0"
+version = "0.1.2"
 description = "Generate an interactive geo-heatmap from your Google location data"
 authors = ["James Jarvis <git@jamesjarvis.io>"]
 license = "MIT"
@@ -14,6 +14,9 @@ argparse = "^1.4.0"
 ijson = "^2.5.1"
 
 [tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+geo-heatmap = 'geo_heatmap.console:run'
 
 [build-system]
 requires = ["poetry>=0.12"]
