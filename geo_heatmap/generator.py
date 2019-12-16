@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 
-from argparse import ArgumentParser, RawTextHelpFormatter
 import collections
 import fnmatch
-import folium
-from folium.plugins import HeatMap
-import ijson
 import json
-import os
-from progressbar import ProgressBar, Bar, ETA, Percentage
-from utils import *
-import webbrowser
-from xml.etree import ElementTree
-from xml.dom import minidom
 import zipfile
+from xml.dom import minidom
+
+import folium
+import ijson
+from folium.plugins import HeatMap
+from progressbar import ETA, Bar, Percentage, ProgressBar
+
+from .utils import *
 
 
 class Generator:
@@ -38,7 +36,7 @@ class Generator:
                 if "latitudeE7" not in loc or "longitudeE7" not in loc:
                     continue
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
-                           round(loc["longitudeE7"] / 1e7, 6))
+                          round(loc["longitudeE7"] / 1e7, 6))
 
                 if timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
@@ -46,7 +44,7 @@ class Generator:
 
     def streamJSONData(self, json_file, date_range):
         """Stream the Google location data from the given json file.
-        
+
         Arguments:
             json_file {file} -- An open file-like object with JSON-encoded
                 Google location data.
@@ -56,7 +54,7 @@ class Generator:
         # Estimate location amount
         max_value_est = sum(1 for line in json_file) / 13
         json_file.seek(0)
-        
+
         locations = ijson.items(json_file, "locations.item")
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=max_value_est, widgets=w) as pb:
@@ -64,11 +62,11 @@ class Generator:
                 if "latitudeE7" not in loc or "longitudeE7" not in loc:
                     continue
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
-                            round(loc["longitudeE7"] / 1e7, 6))
+                          round(loc["longitudeE7"] / 1e7, 6))
 
                 if timestampInRange(loc['timestampMs'], date_range):
                     self.updateCoord(coords)
-                    
+
                 if i > max_value_est:
                     max_value_est = i
                     pb.max_value = i
@@ -131,7 +129,7 @@ class Generator:
                 self.loadKMLData(read_file, date_range)
         else:
             raise ValueError("unsupported extension for {!r}: only .json and .kml supported"
-                .format(file_name))
+                             .format(file_name))
 
     def updateCoord(self, coords):
         self.coordinates[coords] += 1
@@ -171,8 +169,8 @@ class Generator:
         """
         for i, data_file in enumerate(data_files):
             print("\n({}/{}) Loading data from {}".format(
-                i + 1, 
-                len(data_files) + 2, 
+                i + 1,
+                len(data_files) + 2,
                 data_file))
             if data_file.endswith(".zip"):
                 self.loadZIPData(data_file, date_range)
@@ -187,9 +185,9 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
-                
+
         print("\n({}/{}) Generating heatmap".format(
-            len(data_files) + 1, 
+            len(data_files) + 1,
             len(data_files) + 2))
         m = self.generateMap(tiles)
         print("\n({}/{}) Saving map to {}\n".format(
@@ -197,41 +195,3 @@ class Generator:
             len(data_files) + 2,
             output_file))
         m.save(output_file)
-
-
-if __name__ == "__main__":
-    parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
-    parser.add_argument(
-        "files", metavar="file", type=str, nargs='+', help="Any of the following files:\n"
-        "1. Your location history JSON file from Google Takeout\n"
-        "2. Your location history KML file from Google Takeout\n"
-        "3. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
-    parser.add_argument("-o", "--output", dest="output", metavar="", type=str, required=False,
-                        help="Path of heatmap HTML output file.", default="heatmap.html")
-    parser.add_argument("--min-date", dest="min_date", metavar="YYYY-MM-DD", type=str, required=False,
-                        help="The earliest date from which you want to see data in the heatmap.")
-    parser.add_argument("--max-date", dest="max_date", metavar="YYYY-MM-DD", type=str, required=False,
-                        help="The latest date from which you want to see data in the heatmap.")
-    parser.add_argument("-s", "--stream", dest="stream", action="store_true", help="Option to iteratively load data.")
-    parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
-                        help="The name of the map tiles you want to use.\n" \
-                        "(e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')")
-
-    args = parser.parse_args()
-    data_file = args.files
-    output_file = args.output
-    date_range = args.min_date, args.max_date
-    tiles = args.map
-    stream_data = args.stream
-
-    generator = Generator()
-    generator.run(data_file, output_file, date_range, stream_data, tiles)
-    # Check if browser is text-based
-    if not isTextBasedBrowser(webbrowser.get()):
-        try:
-            print("[info] Opening {} in browser".format(output_file))
-            webbrowser.open("file://" + os.path.realpath(output_file))
-        except webbrowser.Error:
-            print("[info] No runnable browser found. Open {} manually.".format(
-                output_file))
-            print("[info] Path to heatmap file: \"{}\"".format(os.path.abspath(output_file)))
