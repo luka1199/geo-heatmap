@@ -2,8 +2,10 @@
 name = "geo-heatmap"
 version = "0.1.2"
 description = "Generate an interactive geo-heatmap from your Google location data"
-authors = ["James Jarvis <git@jamesjarvis.io>"]
+authors = ["Luka Steinbach <luka.steinbach@gmx.de>", "James Jarvis <git@jamesjarvis.io>"]
 license = "MIT"
+repository = "https://github.com/jamesjarvis/geo-heatmap"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"
