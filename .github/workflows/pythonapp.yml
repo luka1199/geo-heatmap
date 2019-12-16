@@ -1,0 +1,36 @@
+name: Will it build?
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install
+        uses: abatilo/actions-poetry@v1.1.0
+        with:
+          python_version: 3.8.0
+          poetry_version: 1.0.0
+          args: install
+      - name: Run build
+        uses: abatilo/actions-poetry@v1.1.0
+        with:
+          python_version: 3.8.0
+          poetry_version: 1.0.0
+          args: build
+      - name: Publish package to TestPyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.test_pypi_password }}
+          repository_url: https://test.pypi.org/legacy/
+      - name: Publish package to PyPI
+        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}
