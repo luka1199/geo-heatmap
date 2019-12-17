@@ -4,8 +4,8 @@ ENV APP_HOME /home
 WORKDIR $APP_HOME
 COPY . .
 
-RUN pip install -r requirements.txt
-RUN pip install flask
-RUN pip install werkzeug
+RUN pip install -r requirements.txt \
+  &&  pip install flask \
+  && pip install werkzeug
 
 CMD python web.py

@@ -7,12 +7,13 @@ This is a script that generates an interactive geo heatmap from your Google loca
 ## Getting Started
 
 ### Using docker web-server
-`docker build -t geo_heatmap_web . && docker run -d -p 80:80 geo_heatmap_web`
+```shell
+docker build -t geo_heatmap_web . 
+docker run -d -p 80:80 geo_heatmap_web
+```
 
 Open browser on `http://localhost`
 ___
-
-### Or runing from source
 
 ### 1. Install Python 3+
 
