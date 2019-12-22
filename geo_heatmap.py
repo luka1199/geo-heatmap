@@ -97,6 +97,29 @@ class Generator:
                     self.updateCoord(coords)
                 pb.update(i)
 
+    def loadGPXData(self, file_name, date_range):
+        """Loads location data from the given GPX file.
+
+        Arguments:
+            file_name {string or file} -- The name of the GPX file
+                (or an open file-like object) with the GPX data.
+            date_range {tuple} -- A tuple containing the min-date and max-date.
+                e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
+        """
+        xmldoc = minidom.parse(file_name)
+        gxtrack = xmldoc.getElementsByTagName("trkpt")
+        w = [Bar(), Percentage(), " ", ETA()]
+
+        with ProgressBar(max_value=len(gxtrack), widgets=w) as pb:
+            for i, trkpt in enumerate(gxtrack):
+                lat = trkpt.getAttribute("lat")
+                lon = trkpt.getAttribute("lon")
+                coords = (round(float(lat), 6), round(float(lon), 6))
+                date = trkpt.getElementsByTagName("time")[0].firstChild.data
+                if dateInRange(date[:10], date_range):
+                    self.updateCoord(coords)
+                pb.update(i)
+
     def loadZIPData(self, file_name, date_range):
         """
         Load Google location data from a "takeout-*.zip" file.
@@ -184,6 +207,8 @@ class Generator:
                         self.loadJSONData(json_file, date_range)
             elif data_file.endswith(".kml"):
                 self.loadKMLData(data_file, date_range)
+            elif data_file.endswith(".gpx"):
+                self.loadGPXData(data_file, date_range)
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
@@ -205,7 +230,8 @@ if __name__ == "__main__":
         "files", metavar="file", type=str, nargs='+', help="Any of the following files:\n"
         "1. Your location history JSON file from Google Takeout\n"
         "2. Your location history KML file from Google Takeout\n"
-        "3. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
+        "3. A GPX file containing GPS tracks\n"
+        "4. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
     parser.add_argument("-o", "--output", dest="output", metavar="", type=str, required=False,
                         help="Path of heatmap HTML output file.", default="heatmap.html")
     parser.add_argument("--min-date", dest="min_date", metavar="YYYY-MM-DD", type=str, required=False,
