@@ -17,6 +17,9 @@ Here you can download all of the data that Google has stored on you: <https://ta
 
 To use this script, you only need to select and download your "Location History", which Google will provide to you as a JSON file by default.  KML is also an output option and is accepted for this program.
 
+You can also import [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files,
+e.g. from a GPS tracker.
+
 ### 3. Clone This Repository
 
 On <https://github.com/luka1199/geo-heatmap>, click the green "Clone or Download" button at the top right of the page. If you want to get started with this script more quickly, click the "Download ZIP" button, and extract the ZIP somewhere on your computer.
@@ -39,9 +42,10 @@ python geo_heatmap.py <file> [<file> ...]
 
 Replace the string `<file>` from above with the path to any of the following files:
 
-1. The `Location History.json` JSON file from Google Takeout
-2. The `Location History.kml` KML file from Google Takeout
-3. The `takeout-*.zip` raw download from Google Takeout that contains either of the above files
+- The `Location History.json` JSON file from Google Takeout
+- The `Location History.kml` KML file from Google Takeout
+- [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files
+- The `takeout-*.zip` raw download from Google Takeout that contains either of the above files
 
 #### Examples:
 

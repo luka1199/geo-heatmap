@@ -228,10 +228,10 @@ if __name__ == "__main__":
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument(
         "files", metavar="file", type=str, nargs='+', help="Any of the following files:\n"
-        "1. Your location history JSON file from Google Takeout\n"
-        "2. Your location history KML file from Google Takeout\n"
-        "3. A GPX file containing GPS tracks\n"
-        "4. The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
+        "- Your location history JSON file from Google Takeout\n"
+        "- Your location history KML file from Google Takeout\n"
+        "- A GPX file containing GPS tracks\n"
+        "- The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
     parser.add_argument("-o", "--output", dest="output", metavar="", type=str, required=False,
                         help="Path of heatmap HTML output file.", default="heatmap.html")
     parser.add_argument("--min-date", dest="min_date", metavar="YYYY-MM-DD", type=str, required=False,
