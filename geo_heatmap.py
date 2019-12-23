@@ -8,7 +8,8 @@ from folium.plugins import HeatMap
 import ijson
 import json
 import os
-from progressbar import ProgressBar, Bar, ETA, Percentage
+import posixpath
+from progressbar import ProgressBar, NullBar, Bar, ETA, Percentage, Variable
 from utils import *
 import webbrowser
 from xml.etree import ElementTree
@@ -97,7 +98,7 @@ class Generator:
                     self.updateCoord(coords)
                 pb.update(i)
 
-    def loadGPXData(self, file_name, date_range):
+    def loadGPXData(self, file_name, date_range, make_progress_bar=ProgressBar):
         """Loads location data from the given GPX file.
 
         Arguments:
@@ -105,22 +106,22 @@ class Generator:
                 (or an open file-like object) with the GPX data.
             date_range {tuple} -- A tuple containing the min-date and max-date.
                 e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
+            make_progress_bar -- progress bar factory (specify NullBar to suppress progress bar)
         """
         xmldoc = minidom.parse(file_name)
         gxtrack = xmldoc.getElementsByTagName("trkpt")
         w = [Bar(), Percentage(), " ", ETA()]
 
-        with ProgressBar(max_value=len(gxtrack), widgets=w) as pb:
-            for i, trkpt in enumerate(gxtrack):
+        with make_progress_bar(max_value=len(gxtrack), widgets=w) as pb:
+            for trkpt in pb(gxtrack):
                 lat = trkpt.getAttribute("lat")
                 lon = trkpt.getAttribute("lon")
                 coords = (round(float(lat), 6), round(float(lon), 6))
                 date = trkpt.getElementsByTagName("time")[0].firstChild.data
                 if dateInRange(date[:10], date_range):
                     self.updateCoord(coords)
-                pb.update(i)
 
-    def loadZIPData(self, file_name, date_range):
+    def loadGoogleTakeOutZIPData(self, file_name, date_range):
         """
         Load Google location data from a "takeout-*.zip" file.
         """
@@ -155,6 +156,40 @@ class Generator:
         else:
             raise ValueError("unsupported extension for {!r}: only .json and .kml supported"
                 .format(file_name))
+
+    def loadAppleHealthData(self, file_name, date_range):
+        """
+        Load location data from an Apple Health Export file.
+        """
+        with zipfile.ZipFile(file_name) as zip_file:
+            namelist = zip_file.namelist()
+            all_routes = fnmatch.filter(namelist, "apple_health_export/workout-routes/*.gpx")
+            filtered_routes = [name for name in all_routes if dateInRange(posixpath.basename(name)[6:16], date_range)]
+
+            w = [Bar(), Percentage(), " ", Variable('name', width=30), " ", ETA()]
+            with ProgressBar(max_value=len(filtered_routes), widgets=w) as pb:
+                for i, name in enumerate(filtered_routes):
+                    pb.update(i, name=posixpath.basename(name))
+                    with zip_file.open(name) as read_file:
+                        self.loadGPXData(read_file, date_range, make_progress_bar=NullBar)
+
+    def loadZIPData(self, file_name, date_range):
+        """
+        Load location data from a zip file.
+
+        Supported zip files:
+         - Google Takekout
+         - Apple Health export
+        """
+        with zipfile.ZipFile(file_name) as zip_file:
+            namelist = zip_file.namelist()
+            if fnmatch.filter(namelist, "Takeout/*.html"):
+                self.loadGoogleTakeOutZIPData(file_name, date_range)
+            elif fnmatch.filter(namelist, "apple_health_export/Export.xml"):
+                self.loadAppleHealthData(file_name, date_range)
+            else:
+                raise ValueError("unsupported ZIP file {!r}: only Google Takeout and Apple Health supported"
+                    .format(file_name))
 
     def updateCoord(self, coords):
         self.coordinates[coords] += 1
@@ -230,8 +265,10 @@ if __name__ == "__main__":
         "files", metavar="file", type=str, nargs='+', help="Any of the following files:\n"
         "- Your location history JSON file from Google Takeout\n"
         "- Your location history KML file from Google Takeout\n"
+        "- The takeout-*.zip raw download from Google Takeout \n  that contains either of the above files\n"
         "- A GPX file containing GPS tracks\n"
-        "- The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files")
+        "- An Export.zip file from Apple Health"
+        )
     parser.add_argument("-o", "--output", dest="output", metavar="", type=str, required=False,
                         help="Path of heatmap HTML output file.", default="heatmap.html")
     parser.add_argument("--min-date", dest="min_date", metavar="YYYY-MM-DD", type=str, required=False,
