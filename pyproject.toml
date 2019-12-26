@@ -12,7 +12,6 @@ python = "^3.7"
 beautifulsoup4 = "^4.8.1"
 folium = "^0.10.1"
 progressbar2 = "^3.47.0"
-argparse = "^1.4.0"
 ijson = "^2.5.1"
 
 [tool.poetry.dev-dependencies]
