@@ -153,3 +153,15 @@ If you would like to develop on this further, after cloning this repository and 
 poetry install
 poetry run geo-heatmap
 ```
+
+To add a new dependency, run:
+
+```shell
+poetry add X
+```
+
+and for those who want to still use the old `requirements.txt` way of installing dependencies, you can regenerate this with:
+
+```shell
+poetry export -f requirements.txt > requirements.txt
+```
