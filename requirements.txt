@@ -1,4 +1,4 @@
-beautifulsoup4
-folium
-progressbar2
-ijson
+beautifulsoup4==4.8.1
+folium==0.10.1
+ijson==2.5.1
+progressbar2==3.47.0

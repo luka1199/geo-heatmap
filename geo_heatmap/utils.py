@@ -4,6 +4,7 @@ import webbrowser
 
 TEXT_BASED_BROWSERS = [webbrowser.GenericBrowser, webbrowser.Elinks]
 
+
 def isTextBasedBrowser(browser):
     """Returns if browser is a text-based browser.
 
