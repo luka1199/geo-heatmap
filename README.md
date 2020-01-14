@@ -20,6 +20,11 @@ To use this script, you only need to select and download your "Location History"
 You can also import [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files,
 e.g. from a GPS tracker.
 
+If you are using Apple Watch, you can export track data using the Health app on your iPhone:
+ - Open the Health app on your iPhone
+ - Tap on the profile icon in the top right corner
+ - Select "Export Health Data"
+
 ### 3. Clone This Repository
 
 On <https://github.com/luka1199/geo-heatmap>, click the green "Clone or Download" button at the top right of the page. If you want to get started with this script more quickly, click the "Download ZIP" button, and extract the ZIP somewhere on your computer.
@@ -44,8 +49,9 @@ Replace the string `<file>` from above with the path to any of the following fil
 
 - The `Location History.json` JSON file from Google Takeout
 - The `Location History.kml` KML file from Google Takeout
-- [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files
 - The `takeout-*.zip` raw download from Google Takeout that contains either of the above files
+- [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files
+- Zip files exported from Apple Health
 
 #### Examples:
 
@@ -84,16 +90,16 @@ python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
 #### Usage:
 
 ```
-usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
-                      [--max-date YYYY-MM-DD] [-s] [--map MAP]
-                      file [file ...]
+usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD] [--max-date YYYY-MM-DD] [-s] [--map MAP] file [file ...]
 
 positional arguments:
   file                  Any of the following files:
-                        1. Your location history JSON file from Google Takeout
-                        2. Your location history KML file from Google Takeout
-                        3. The takeout-*.zip raw download from Google Takeout
-                        that contains either of the above files
+                        - Your location history JSON file from Google Takeout
+                        - Your location history KML file from Google Takeout
+                        - The takeout-*.zip raw download from Google Takeout 
+                          that contains either of the above files
+                        - A GPX file containing GPS tracks
+                        - An Export.zip file from Apple Health
 
 optional arguments:
   -h, --help            show this help message and exit
