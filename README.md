@@ -44,8 +44,8 @@ Replace the string `<file>` from above with the path to any of the following fil
 
 - The `Location History.json` JSON file from Google Takeout
 - The `Location History.kml` KML file from Google Takeout
-- [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files
 - The `takeout-*.zip` raw download from Google Takeout that contains either of the above files
+- [GPS Exchange Format (GPX)](https://en.wikipedia.org/wiki/GPS_Exchange_Format) files
 
 #### Examples:
 
