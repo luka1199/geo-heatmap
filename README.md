@@ -81,19 +81,26 @@ Set a date range:
 python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
 ```
 
+Advanced heatmap settings:
+```shell
+python .\geo_heatmap.py -z 15 -r 12 -b 7 -mo 0.3 -mz 20 locations.json
+```
+
 #### Usage:
 
 ```
 usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
-                      [--max-date YYYY-MM-DD] [-s] [--map MAP]
+                      [--max-date YYYY-MM-DD] [-s] [--map MAP] [-z ZOOM_START]
+                      [-r RADIUS] [-b BLUR] [-mo MIN_OPACITY] [-mz MAX_ZOOM]
                       file [file ...]
 
 positional arguments:
   file                  Any of the following files:
-                        1. Your location history JSON file from Google Takeout
-                        2. Your location history KML file from Google Takeout
-                        3. The takeout-*.zip raw download from Google Takeout
+                        - Your location history JSON file from Google Takeout
+                        - Your location history KML file from Google Takeout
+                        - The takeout-*.zip raw download from Google Takeout
                         that contains either of the above files
+                        - A GPX file containing GPS tracks
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -105,6 +112,15 @@ optional arguments:
   -s, --stream          Option to iteratively load data.
   --map MAP, -m MAP     The name of the map tiles you want to use.
                         (e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')
+  -z ZOOM_START, --zoom_start ZOOM_START
+                        The initial zoom level for the map. (default: 6)
+  -r RADIUS, --radius RADIUS
+                        The radius of each location point. (default: 7)
+  -b BLUR, --blur BLUR  The amount of blur. (default: 4)
+  -mo MIN_OPACITY, --min_opacity MIN_OPACITY
+                        The minimum opacity of the heatmap. (default: 0.2)
+  -mz MAX_ZOOM, --max_zoom MAX_ZOOM
+                        The maximum zoom of the heatmap. (default: 4)
 ```
 
 ### 6. Review the Results

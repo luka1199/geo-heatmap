@@ -40,7 +40,7 @@ class Generator:
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                            round(loc["longitudeE7"] / 1e7, 6))
 
-                if timestampInRange(loc['timestampMs'], date_range):
+                if timestampInRange(loc["timestampMs"], date_range):
                     self.updateCoord(coords)
                 pb.update(i)
 
@@ -66,7 +66,7 @@ class Generator:
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                             round(loc["longitudeE7"] / 1e7, 6))
 
-                if timestampInRange(loc['timestampMs'], date_range):
+                if timestampInRange(loc["timestampMs"], date_range):
                     self.updateCoord(coords)
                     
                 if i > max_value_est:
@@ -162,36 +162,54 @@ class Generator:
             self.max_coordinates = coords
             self.max_magnitude = self.coordinates[coords]
 
-    def generateMap(self, tiles, map_zoom_start=6, heatmap_radius=7,
-                    heatmap_blur=4, heatmap_min_opacity=0.2,
-                    heatmap_max_zoom=4):
+    def generateMap(self, settings):
+        """Generates the heatmap.
+        
+        Arguments:
+            settings {dict} -- The settings for the heatmap.
+        
+        Returns:
+            Map -- The Heatmap.
+        """
+        tiles = settings["tiles"]
+        zoom_start = settings["zoom_start"]
+        radius = settings["radius"]
+        blur = settings["blur"]
+        min_opacity = settings["min_opacity"]
+        max_zoom = settings["max_zoom"]
+        
         map_data = [(coords[0], coords[1], magnitude)
                     for coords, magnitude in self.coordinates.items()]
 
         # Generate map
         m = folium.Map(location=self.max_coordinates,
-                       zoom_start=map_zoom_start,
+                       zoom_start=zoom_start,
                        tiles=tiles)
 
         # Generate heat map
         heatmap = HeatMap(map_data,
                           max_val=self.max_magnitude,
-                          min_opacity=heatmap_min_opacity,
-                          radius=heatmap_radius,
-                          blur=heatmap_blur,
-                          max_zoom=heatmap_max_zoom)
+                          min_opacity=min_opacity,
+                          radius=radius,
+                          blur=blur,
+                          max_zoom=max_zoom)
 
         m.add_child(heatmap)
         return m
 
-    def run(self, data_files, output_file, date_range, stream_data, tiles):
+    def run(self, data_files, output_file, date_range, stream_data, settings):
         """Load the data, generate the heatmap and save it.
 
         Arguments:
             data_files {list} -- List of names of the data files with the Google
                 location data or the Google takeout ZIP archive.
             output_file {string} -- The name of the output file.
+            date_range {tuple} -- A tuple containing the min-date and max-date.
+                e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
+            stream_data {bool} -- Stream option.
+            settings {dict} -- The settings for the heatmap.
         """
+        
         for i, data_file in enumerate(data_files):
             print("\n({}/{}) Loading data from {}".format(
                 i + 1, 
@@ -213,10 +231,10 @@ class Generator:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
                 
-        print("\n({}/{}) Generating heatmap".format(
+        print("\n({}/{}) generateMapGenerating heatmap".format(
             len(data_files) + 1, 
             len(data_files) + 2))
-        m = self.generateMap(tiles)
+        m = self.generateMap(settings)
         print("\n({}/{}) Saving map to {}\n".format(
             len(data_files) + 2,
             len(data_files) + 2,
@@ -227,7 +245,7 @@ class Generator:
 if __name__ == "__main__":
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
     parser.add_argument(
-        "files", metavar="file", type=str, nargs='+', help="Any of the following files:\n"
+        "files", metavar="file", type=str, nargs="+", help="Any of the following files:\n"
         "- Your location history JSON file from Google Takeout\n"
         "- Your location history KML file from Google Takeout\n"
         "- The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files\n"
@@ -242,16 +260,34 @@ if __name__ == "__main__":
     parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
                         help="The name of the map tiles you want to use.\n" \
                         "(e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')")
+    parser.add_argument("-z", "--zoom_start", type=int, required=False,
+                        help="The initial zoom level for the map. (default: %(default)s)", default=6)
+    parser.add_argument("-r", "--radius", type=int, required=False,
+                        help="The radius of each location point. (default: %(default)s)", default=7)
+    parser.add_argument("-b", "--blur", type=int, required=False,
+                        help="The amount of blur. (default: %(default)s)", default=4)
+    parser.add_argument("-mo", "--min_opacity", type=float, required=False,
+                        help="The minimum opacity of the heatmap. (default: %(default)s)", default=0.2)
+    parser.add_argument("-mz", "--max_zoom", type=int, required=False,
+                        help="The maximum zoom of the heatmap. (default: %(default)s)", default=4)
+    
 
     args = parser.parse_args()
     data_file = args.files
     output_file = args.output
     date_range = args.min_date, args.max_date
-    tiles = args.map
     stream_data = args.stream
+    settings = {
+        "tiles": args.map,
+        "zoom_start": args.zoom_start,
+        "radius": args.radius,
+        "blur": args.blur,
+        "min_opacity": args.min_opacity,
+        "max_zoom": args.max_zoom
+    }
 
     generator = Generator()
-    generator.run(data_file, output_file, date_range, stream_data, tiles)
+    generator.run(data_file, output_file, date_range, stream_data, settings)
     # Check if browser is text-based
     if not isTextBasedBrowser(webbrowser.get()):
         try:
