@@ -113,14 +113,14 @@ optional arguments:
   -s, --stream          Option to iteratively load data.
   --map MAP, -m MAP     The name of the map tiles you want to use.
                         (e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')
-  -z ZOOM_START, --zoom_start ZOOM_START
+  -z ZOOM_START, --zoom-start ZOOM_START
                         The initial zoom level for the map. (default: 6)
   -r RADIUS, --radius RADIUS
                         The radius of each location point. (default: 7)
   -b BLUR, --blur BLUR  The amount of blur. (default: 4)
-  -mo MIN_OPACITY, --min_opacity MIN_OPACITY
+  -mo MIN_OPACITY, --min-opacity MIN_OPACITY
                         The minimum opacity of the heatmap. (default: 0.2)
-  -mz MAX_ZOOM, --max_zoom MAX_ZOOM
+  -mz MAX_ZOOM, --max-zoom MAX_ZOOM
                         The maximum zoom of the heatmap. (default: 4)
 ```
 

@@ -260,15 +260,15 @@ if __name__ == "__main__":
     parser.add_argument("--map", "-m", dest="map", metavar="MAP", type=str, required=False, default="OpenStreetMap",
                         help="The name of the map tiles you want to use.\n" \
                         "(e.g. 'OpenStreetMap', 'StamenTerrain', 'StamenToner', 'StamenWatercolor')")
-    parser.add_argument("-z", "--zoom_start", type=int, required=False,
+    parser.add_argument("-z", "--zoom-start", dest="zoom_start", type=int, required=False,
                         help="The initial zoom level for the map. (default: %(default)s)", default=6)
     parser.add_argument("-r", "--radius", type=int, required=False,
                         help="The radius of each location point. (default: %(default)s)", default=7)
     parser.add_argument("-b", "--blur", type=int, required=False,
                         help="The amount of blur. (default: %(default)s)", default=4)
-    parser.add_argument("-mo", "--min_opacity", type=float, required=False,
+    parser.add_argument("-mo", "--min-opacity", dest="min_opacity", type=float, required=False,
                         help="The minimum opacity of the heatmap. (default: %(default)s)", default=0.2)
-    parser.add_argument("-mz", "--max_zoom", type=int, required=False,
+    parser.add_argument("-mz", "--max-zoom", dest="max_zoom", type=int, required=False,
                         help="The maximum zoom of the heatmap. (default: %(default)s)", default=4)
     
 
