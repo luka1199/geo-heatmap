@@ -89,7 +89,7 @@ python .\geo_heatmap.py -z 15 -r 12 -b 7 -mo 0.3 -mz 20 locations.json
 #### Usage:
 
 ```
-usage: geo_heatmap.py [-h] [-o] [--min-date YYYY-MM-DD]
+usage: geo_heatmap.py [-h] [-o OUTPUT] [--min-date YYYY-MM-DD]
                       [--max-date YYYY-MM-DD] [-s] [--map MAP] [-z ZOOM_START]
                       [-r RADIUS] [-b BLUR] [-mo MIN_OPACITY] [-mz MAX_ZOOM]
                       file [file ...]
@@ -104,7 +104,8 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -o , --output         Path of heatmap HTML output file.
+  -o OUTPUT, --output OUTPUT
+                        Path of heatmap HTML output file.
   --min-date YYYY-MM-DD
                         The earliest date from which you want to see data in the heatmap.
   --max-date YYYY-MM-DD

@@ -250,7 +250,7 @@ if __name__ == "__main__":
         "- Your location history KML file from Google Takeout\n"
         "- The takeout-*.zip raw download from Google Takeout \nthat contains either of the above files\n"
         "- A GPX file containing GPS tracks")
-    parser.add_argument("-o", "--output", dest="output", metavar="", type=str, required=False,
+    parser.add_argument("-o", "--output", dest="output", type=str, required=False,
                         help="Path of heatmap HTML output file.", default="heatmap.html")
     parser.add_argument("--min-date", dest="min_date", metavar="YYYY-MM-DD", type=str, required=False,
                         help="The earliest date from which you want to see data in the heatmap.")
