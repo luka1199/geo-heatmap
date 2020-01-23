@@ -82,8 +82,9 @@ python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
 ```
 
 Advanced heatmap settings:
+
 ```shell
-python .\geo_heatmap.py -z 15 -r 12 -b 7 -mo 0.3 -mz 20 locations.json
+python geo_heatmap.py -z 15 -r 12 -b 7 -mo 0.3 -mz 20 locations.json
 ```
 
 #### Usage:
