@@ -6,6 +6,15 @@ This is a script that generates an interactive geo heatmap from your Google loca
 
 ## Getting Started
 
+### Using docker web-server
+```shell
+docker build -t geo_heatmap_web . 
+docker run -d -p 80:80 geo_heatmap_web
+```
+
+Open browser on `http://localhost`
+___
+
 ### 1. Install Python 3+
 
 If you don't already have Python 3+ installed, grab it from <https://www.python.org/downloads/>. You'll want to download install the latest version of **Python 3.x**. As of 2019-11-22, that is Version 3.8.
