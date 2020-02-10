@@ -12,7 +12,11 @@ docker build -t geo_heatmap_web .
 docker run -d -p 80:80 geo_heatmap_web
 ```
 
-Open browser on `http://localhost`
+`build` command creates a docker `image` from the `Dockerfile` and saves it with name pointed by paramter `-t`.
+`run` command create a new instance of the previews created image and starts it. `-p` parameter is used to public and map
+the host ports with the container ports.
+
+Now open browser on `http://localhost`
 ___
 
 ### 1. Install Python 3+
