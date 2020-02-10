@@ -1,5 +1,5 @@
 import os
-from flask import Flask, flash, request, redirect, url_for, send_from_directory, current_app
+from flask import Flask, flash, request, redirect, url_for, send_from_directory, current_app, render_template
 from werkzeug.utils import secure_filename
 from geo_heatmap import Generator
 
@@ -44,16 +44,7 @@ def upload_file():
 
             return redirect(url_for('download',
                                     filename=path_out.split('/')[-1]))
-    return '''
-    <!doctype html>
-    <title>Geo Heatmap Generator</title>
-    <h1>Geo Heatmap Generator</h1>
-    <h2>Upload zip file from Google Maps History</h2>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 80)))
