@@ -21,6 +21,12 @@ class Generator:
         self.coordinates = collections.defaultdict(int)
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
+        self.resetStats()
+    
+    def resetStats(self):
+        self.stats = {
+            "Data points": 0
+        }
 
     def loadJSONData(self, json_file, date_range):
         """Loads the Google location data from the given json file.
@@ -158,6 +164,7 @@ class Generator:
 
     def updateCoord(self, coords):
         self.coordinates[coords] += 1
+        self.stats["Data points"] += 1
         if self.coordinates[coords] > self.max_magnitude:
             self.max_coordinates = coords
             self.max_magnitude = self.coordinates[coords]
@@ -209,7 +216,8 @@ class Generator:
             stream_data {bool} -- Stream option.
             settings {dict} -- The settings for the heatmap.
         """
-        
+        self.resetStats()
+
         for i, data_file in enumerate(data_files):
             print("\n({}/{}) Loading data from {}".format(
                 i + 1, 
@@ -241,6 +249,10 @@ class Generator:
             output_file))
         m.save(output_file)
 
+        print("Stats:")
+        for name, stat in self.stats.items():
+            print("{}: {}".format(name, stat))
+        print()
 
 if __name__ == "__main__":
     parser = ArgumentParser(formatter_class=RawTextHelpFormatter)
