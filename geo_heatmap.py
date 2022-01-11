@@ -191,7 +191,8 @@ class Generator:
         # Generate map
         m = folium.Map(location=self.max_coordinates,
                        zoom_start=zoom_start,
-                       tiles=tiles)
+                       tiles=tiles,
+                       attr="<a href=https://github.com/luka1199/geo-heatmap>geo-heatmap</a>")
 
         # Generate heat map
         heatmap = HeatMap(map_data,
