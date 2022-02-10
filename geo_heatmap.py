@@ -86,12 +86,17 @@ class Generator:
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=max_value_est, widgets=w) as pb:
             for i, loc in enumerate(locations):
+                # Find the correct key for timestamps
+                # This is done in the loop because the data are streamed
+                if i == 0:
+                    key_timestamp = self.find_timestamp_key(loc)
+
                 if "latitudeE7" not in loc or "longitudeE7" not in loc:
                     continue
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                             round(loc["longitudeE7"] / 1e7, 6))
 
-                if timestampInRange(loc["timestampMs"], date_range):
+                if timestampInRange(loc[key_timestamp], date_range):
                     self.updateCoord(coords)
 
                 if i > max_value_est:
