@@ -28,6 +28,20 @@ class Generator:
             "Data points": 0
         }
 
+    @staticmethod
+    def find_timestamp_key(json_element):
+        """Find the correct key for timestamps - Google changed this in early 2022.
+        Earlier, the correct key was "timestampMs".
+        Now, it is "timestamp".
+        This function simply tries to find these keys in the first data element.
+        """
+        if "timestampMs" in json_element.keys():  # Old data
+            key_timestamp = "timestampMs"
+        else:  # New data
+            key_timestamp = "timestamp"
+
+        return key_timestamp
+
     def loadJSONData(self, json_file, date_range):
         """Loads the Google location data from the given json file.
 
@@ -38,11 +52,10 @@ class Generator:
                 e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
         """
         data = json.load(json_file)
-        # Find the correct key for timestamps - Google changed this in early 2022
-        if "timestampMs" in data["locations"][0].keys():  # Old data
-            key_timestamp = "timestampMs"
-        else:  # New data
-            key_timestamp = "timestamp"
+
+        # Find the correct key for timestamps
+        first_element = data["locations"][0]
+        key_timestamp = self.find_timestamp_key(first_element)
 
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
