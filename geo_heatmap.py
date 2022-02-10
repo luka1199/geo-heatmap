@@ -22,7 +22,7 @@ class Generator:
         self.max_coordinates = (0, 0)
         self.max_magnitude = 0
         self.resetStats()
-    
+
     def resetStats(self):
         self.stats = {
             "Data points": 0
@@ -38,6 +38,12 @@ class Generator:
                 e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
         """
         data = json.load(json_file)
+        # Find the correct key for timestamps - Google changed this in early 2022
+        if "timestampMs" in data["locations"][0].keys():  # Old data
+            key_timestamp = "timestampMs"
+        else:  # New data
+            key_timestamp = "timestamp"
+
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
             for i, loc in enumerate(data["locations"]):
@@ -46,13 +52,13 @@ class Generator:
                 coords = (round(loc["latitudeE7"] / 1e7, 6),
                            round(loc["longitudeE7"] / 1e7, 6))
 
-                if timestampInRange(loc["timestampMs"], date_range):
+                if timestampInRange(loc[key_timestamp], date_range):
                     self.updateCoord(coords)
                 pb.update(i)
 
     def streamJSONData(self, json_file, date_range):
         """Stream the Google location data from the given json file.
-        
+
         Arguments:
             json_file {file} -- An open file-like object with JSON-encoded
                 Google location data.
@@ -62,7 +68,7 @@ class Generator:
         # Estimate location amount
         max_value_est = sum(1 for line in json_file) / 13
         json_file.seek(0)
-        
+
         locations = ijson.items(json_file, "locations.item")
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=max_value_est, widgets=w) as pb:
@@ -74,7 +80,7 @@ class Generator:
 
                 if timestampInRange(loc["timestampMs"], date_range):
                     self.updateCoord(coords)
-                    
+
                 if i > max_value_est:
                     max_value_est = i
                     pb.max_value = i
@@ -171,10 +177,10 @@ class Generator:
 
     def generateMap(self, settings):
         """Generates the heatmap.
-        
+
         Arguments:
             settings {dict} -- The settings for the heatmap.
-        
+
         Returns:
             Map -- The Heatmap.
         """
@@ -184,7 +190,7 @@ class Generator:
         blur = settings["blur"]
         min_opacity = settings["min_opacity"]
         max_zoom = settings["max_zoom"]
-        
+
         map_data = [(coords[0], coords[1], magnitude)
                     for coords, magnitude in self.coordinates.items()]
 
@@ -221,8 +227,8 @@ class Generator:
 
         for i, data_file in enumerate(data_files):
             print("\n({}/{}) Loading data from {}".format(
-                i + 1, 
-                len(data_files) + 2, 
+                i + 1,
+                len(data_files) + 2,
                 data_file))
             if data_file.endswith(".zip"):
                 self.loadZIPData(data_file, date_range)
@@ -239,9 +245,9 @@ class Generator:
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
-                
+
         print("\n({}/{}) Generating heatmap".format(
-            len(data_files) + 1, 
+            len(data_files) + 1,
             len(data_files) + 2))
         m = self.generateMap(settings)
         print("\n({}/{}) Saving map to {}\n".format(
@@ -283,7 +289,7 @@ if __name__ == "__main__":
                         help="The minimum opacity of the heatmap. (default: %(default)s)", default=0.2)
     parser.add_argument("-mz", "--max-zoom", dest="max_zoom", type=int, required=False,
                         help="The maximum zoom of the heatmap. (default: %(default)s)", default=4)
-    
+
 
     args = parser.parse_args()
     data_file = args.files
