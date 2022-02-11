@@ -29,7 +29,7 @@ class Generator:
         }
 
     @staticmethod
-    def find_timestamp_key(json_element):
+    def findTimestampKey(json_element):
         """Find the correct key for timestamps - Google changed this in early 2022.
         Earlier, the correct key was "timestampMs".
         Now, it is "timestamp".
@@ -55,7 +55,7 @@ class Generator:
 
         # Find the correct key for timestamps
         first_element = data["locations"][0]
-        key_timestamp = self.find_timestamp_key(first_element)
+        key_timestamp = self.findTimestampKey(first_element)
 
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=len(data["locations"]), widgets=w) as pb:
@@ -89,7 +89,7 @@ class Generator:
                 # Find the correct key for timestamps
                 # This is done in the loop because the data are streamed
                 if i == 0:
-                    key_timestamp = self.find_timestamp_key(loc)
+                    key_timestamp = self.findTimestampKey(loc)
 
                 if "latitudeE7" not in loc or "longitudeE7" not in loc:
                     continue
