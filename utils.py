@@ -20,7 +20,7 @@ def isTextBasedBrowser(browser):
     return False
 
 
-def parse_timestamp(timestamp: str) -> datetime:
+def parseTimestamp(timestamp: str) -> datetime:
     try:
         return datetime.fromtimestamp(int(timestamp) / 1000, tzinfo=timezone.utc)
     except ValueError:
@@ -38,7 +38,7 @@ def timestampInRange(timestamp: str, date_range) -> bool:
     """
     if date_range == (None, None):
         return True
-    date_str = parse_timestamp(timestamp).strftime("%Y-%m-%d")
+    date_str = parseTimestamp(timestamp).strftime("%Y-%m-%d")
     return dateInRange(date_str, date_range)
 
 
