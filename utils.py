@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import webbrowser
 
 
@@ -20,7 +20,15 @@ def isTextBasedBrowser(browser):
     return False
 
 
-def timestampInRange(timestamp, date_range):
+def parseTimestamp(timestamp: str) -> datetime:
+    try:
+        return datetime.fromtimestamp(int(timestamp) / 1000, tzinfo=timezone.utc)
+    except ValueError:
+        # timestamp like '2012-07-30T17:47:01.687Z' or '2012-08-03T03:53:44Z'
+        return datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+
+
+def timestampInRange(timestamp: str, date_range) -> bool:
     """Returns if the timestamp is in the date range.
 
     Arguments:
@@ -30,13 +38,11 @@ def timestampInRange(timestamp, date_range):
     """
     if date_range == (None, None):
         return True
-    date_str = datetime.fromtimestamp(
-        int(timestamp) / 1000).strftime("%Y-%m-%d")
-
+    date_str = parseTimestamp(timestamp).strftime("%Y-%m-%d")
     return dateInRange(date_str, date_range)
 
 
-def dateInRange(date, date_range):
+def dateInRange(date, date_range) -> bool:
     """Returns if the date is in the date range.
 
     Arguments:
