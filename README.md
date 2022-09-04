@@ -52,7 +52,7 @@ Replace the string `<file>` from above with the path to any of the following fil
 Single file:
 
 ```shell
-python geo_heatmap.py C:\Users\Testuser\Desktop\locations.json
+python geo_heatmap.py C:\Users\Testuser\Desktop\Records.json
 ```
 
 ```shell
@@ -60,31 +60,31 @@ python geo_heatmap.py "C:\Users\Testuser\Desktop\Location History.json"
 ```
 
 ```shell
-python geo_heatmap.py locations.json
+python geo_heatmap.py Records.json
 ```
 
 Multiple files:
 
 ```shell
-python geo_heatmap.py locations.json locations.kml takeout.zip
+python geo_heatmap.py Records.json locations.kml takeout.zip
 ```
 
 Using the stream option (for users with Memory Errors):
 
 ```shell
-python geo_heatmap.py -s locations.json
+python geo_heatmap.py -s Records.json
 ```
 
 Set a date range:
 
 ```shell
-python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 locations.json
+python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 Records.json
 ```
 
 Advanced heatmap settings:
 
 ```shell
-python geo_heatmap.py -z 15 -r 12 -b 7 -mo 0.3 -mz 20 locations.json
+python geo_heatmap.py -z 15 -r 12 -b 7 -mo 0.3 -mz 20 Records.json
 ```
 
 #### Usage:
