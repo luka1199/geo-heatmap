@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import numpy as np
 import webbrowser
 
 
@@ -63,3 +64,48 @@ def dateInRange(date, date_range) -> bool:
     date = datetime.strptime(date, "%Y-%m-%d")
     return (min_date is None or min_date <= date) and \
         (max_date is None or max_date >= date)
+
+
+def getColormapAsGradient(name: str, n_steps: int=20) -> dict[int, str]:
+    """Returns the desired colormap in gradient format.
+
+    Colormaps are retrieved from branca.colormap.linear by default.
+    Names starting with mpl. are retrieved from matplotlib (optional import).
+    Names starting with cmc. are retrieved from cmcrameri (optional import).
+
+    Arguments:
+        name {str} -- Colormap name.
+        n_steps {int} -- Number of quantization steps.
+
+    Returns:
+        dict -- Keys are a range from 0 to 1, values are hex strings.
+    """
+    # Define steps
+    steps = np.linspace(0, 1, n_steps)
+
+    # Default behavior: Get from branca
+    if "." not in name or name.lower().startswith("branca."):
+        from branca.colormap import linear as cm
+        cmap = getattr(cm, name)
+        gradient = {i: cmap(i) for i in steps}
+
+    # Get from defined library
+    else:
+        lib, name = name.split(".")
+        lib = lib.lower()
+
+        # Matplotlib and derivatives
+        if lib in ("mpl", "cmc"):
+            from matplotlib.colors import to_hex
+            if lib == "mpl":
+                from matplotlib import colormaps as cm
+                cmap = cm.get_cmap(name)
+            elif lib == "cmc":
+                from cmcrameri import cm
+                cmap = getattr(cm, name)
+            gradient = {i: to_hex(cmap(i)) for i in steps}
+
+        else:
+            raise ValueError(f"Unknown colormap library '{lib}'.")
+
+    return gradient

@@ -208,6 +208,7 @@ class Generator:
         blur = settings["blur"]
         min_opacity = settings["min_opacity"]
         max_zoom = settings["max_zoom"]
+        color_map = settings["color_map"]
 
         map_data = [(coords[0], coords[1], magnitude)
                     for coords, magnitude in self.coordinates.items()]
@@ -219,12 +220,14 @@ class Generator:
                        attr="<a href=https://github.com/luka1199/geo-heatmap>geo-heatmap</a>")
 
         # Generate heat map
+        gradient = getColormapAsGradient(color_map) if color_map else None
         heatmap = HeatMap(map_data,
                           max_val=self.max_magnitude,
                           min_opacity=min_opacity,
                           radius=radius,
                           blur=blur,
-                          max_zoom=max_zoom)
+                          max_zoom=max_zoom,
+                          gradient=gradient)
 
         m.add_child(heatmap)
         return m
@@ -307,7 +310,9 @@ if __name__ == "__main__":
                         help="The minimum opacity of the heatmap. (default: %(default)s)", default=0.2)
     parser.add_argument("-mz", "--max-zoom", dest="max_zoom", type=int, required=False,
                         help="The maximum zoom of the heatmap. (default: %(default)s)", default=4)
-
+    parser.add_argument("-c", "--color-map", dest="color_map", type=str, required=False,
+                        help="The color map to use, from:\n" \
+                        "branca (<name>), matplotlib (mpl.<name>), cmcrameri (cmc.<name>).", default=None)
 
     args = parser.parse_args()
     data_file = args.files
@@ -320,7 +325,8 @@ if __name__ == "__main__":
         "radius": args.radius,
         "blur": args.blur,
         "min_opacity": args.min_opacity,
-        "max_zoom": args.max_zoom
+        "max_zoom": args.max_zoom,
+        "color_map": args.color_map,
     }
 
     generator = Generator()

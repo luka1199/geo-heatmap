@@ -81,6 +81,11 @@ Set a date range:
 python geo_heatmap.py --min-date 2017-01-02 --max-date 2018-12-30 Records.json
 ```
 
+Change the color map:
+```shell
+python geo_heatmap.py -c Set1_09 Records.json
+```
+
 Advanced heatmap settings:
 
 ```shell
@@ -123,6 +128,9 @@ optional arguments:
                         The minimum opacity of the heatmap. (default: 0.2)
   -mz MAX_ZOOM, --max-zoom MAX_ZOOM
                         The maximum zoom of the heatmap. (default: 4)
+  -c COLOR_MAP, --color-map COLOR_MAP
+                        The color map to use, from:
+                        branca (<name>), matplotlib (mpl.<name>), cmcrameri (cmc.<name>)
 ```
 
 ### 6. Review the Results
