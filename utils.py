@@ -54,12 +54,16 @@ def dateInRange(date, date_range) -> bool:
         return True
     if date_range[0] == None:
         min_date = None
-    else:
+    elif len(date_range[0]) == len("%Y-%m-%d"):
         min_date = datetime.strptime(date_range[0], "%Y-%m-%d")
+    else:
+        min_date = datetime.fromisoformat(date_range[0])
     if date_range[1] == None:
         max_date = None
-    else:
+    elif len(date_range[1]) == len("%Y-%m-%d"):
         max_date = datetime.strptime(date_range[1], "%Y-%m-%d")
+    else:
+        max_date = datetime.fromisoformat(date_range[1])
     date = datetime.strptime(date, "%Y-%m-%d")
     return (min_date is None or min_date <= date) and \
         (max_date is None or max_date >= date)
