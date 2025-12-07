@@ -3,3 +3,5 @@ folium
 progressbar2
 ijson
 shapely
+rtree
+python-dateutil

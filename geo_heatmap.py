@@ -290,7 +290,34 @@ class Generator:
         
         return False
 
-    def run(self, data_files, output_file, date_range, stream_data, settings):
+    def loadNewJSONData(self, json_file, date_range):
+        """Loads location data from the new JSON format with 'latLng' strings."""
+        data = json.load(json_file)
+        w = [Bar(), Percentage(), " ", ETA()]
+        with ProgressBar(max_value=len(data), widgets=w) as pb:
+            for i, entry in enumerate(data):
+                latlng = None
+                # Check for 'visit' or 'activity' keys
+                if 'visit' in entry and 'topCandidate' in entry['visit'] and 'placeLocation' in entry['visit']['topCandidate']:
+                    latlng = entry['visit']['topCandidate']['placeLocation']['latLng']
+                elif 'activity' in entry:
+                    if 'start' in entry['activity'] and 'latLng' in entry['activity']['start']:
+                        latlng = entry['activity']['start']['latLng']
+                elif 'timelinePath' in entry:
+                    latlng = entry['timelinePath']['point']
+                if latlng:
+                    # Parse latLng string: e.g. '53.7664594°, -8.9430112°'
+                    lat_str, lon_str = latlng.replace('°', '').split(',')
+                    lat = round(float(lat_str.strip()), 6)
+                    lon = round(float(lon_str.strip()), 6)
+                    # Use startTime for timestamp
+                    timestamp = entry.get('startTime', None)
+                    coords = (lat, lon, timestamp)
+                    if timestampInRange(timestamp, date_range):
+                        self.updateCoord(coords)
+                pb.update(i)
+
+    def run(self, data_files, output_file, date_range, stream_data, settings, newjson):
         """Load the data, generate the heatmap and save it.
 
         Arguments:
@@ -301,6 +328,7 @@ class Generator:
                 e.g.: (None, None), (None, '2019-01-01'), ('2017-02-11'), ('2019-01-01')
             stream_data {bool} -- Stream option.
             settings {dict} -- The settings for the heatmap.
+            newjson {bool} -- New JSON format option.
         """
         self.resetStats()
 
@@ -311,7 +339,7 @@ class Generator:
                 data_file))
             if data_file.endswith(".zip"):
                 self.loadZIPData(data_file, date_range)
-            elif data_file.endswith(".json"):
+            elif data_file.endswith(".json") and not newjson:
                 with open(data_file) as json_file:
                     if stream_data:
                         self.streamJSONData(json_file, date_range)
@@ -321,6 +349,9 @@ class Generator:
                 self.loadKMLData(data_file, date_range)
             elif data_file.endswith(".gpx"):
                 self.loadGPXData(data_file, date_range)
+            elif newjson:  # Assume new format uses .newjson extension
+                with open(data_file) as json_file:
+                    self.loadNewJSONData(json_file, date_range)
             else:
                 raise NotImplementedError(
                     "Unsupported file extension for {!r}".format(data_file))
@@ -368,9 +399,14 @@ if __name__ == "__main__":
                         help="The minimum opacity of the heatmap. (default: %(default)s)", default=0.2)
     parser.add_argument("-mz", "--max-zoom", dest="max_zoom", type=int, required=False,
                         help="The maximum zoom of the heatmap. (default: %(default)s)", default=4)
-
+    parser.add_argument("--newjson", dest="newjson", action="store_true", help="Input file is in the new JSON format.")
 
     args = parser.parse_args()
+    # if args.newjson:
+    #     # Use .newjson extension for new format
+    #     data_file = [f if f.endswith('.newjson') else f + '.newjson' for f in args.files]
+    # else:    
+        
     data_file = args.files
     output_file = args.output
     date_range = args.min_date, args.max_date
@@ -383,9 +419,10 @@ if __name__ == "__main__":
         "min_opacity": args.min_opacity,
         "max_zoom": args.max_zoom
     }
+    newjson = args.newjson
 
     generator = Generator()
-    generator.run(data_file, output_file, date_range, stream_data, settings)
+    generator.run(data_file, output_file, date_range, stream_data, settings, newjson)
     # Check if browser is text-based
     if not isTextBasedBrowser(webbrowser.get()):
         try:
