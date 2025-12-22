@@ -222,13 +222,22 @@ class Generator:
         # Loop over coords, for each coord loop over states
         # Create list of states for each coord
         states_directory = "locations/states"
-        states = os.listdir(states_directory)
+        states_polygons = json.load(open(os.path.join("locations", "states.json")))
+        us_states = [
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+            "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+            "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+            "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico",
+            "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania",
+            "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
+            "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+        ]
 
         # --------------- R-tree approach ----------------
         # Step 1: Create the R-tree index for polygons
         idx = index.Index()
-        for i, polygon in enumerate(states):
-            state_polygon = self.get_state_polygon(polygon, states_directory)
+        for i, state in enumerate(us_states):
+            state_polygon = self.get_state_polygon(states_polygons, state)
             idx.insert(i, state_polygon.bounds)
 
         # Step 2 and 3: Check each GPS coordinate
@@ -247,8 +256,8 @@ class Generator:
                 # Step 2: Identify potential matches quickly using the R-tree index
                 for state_id in idx.intersection(point.coords[0]):
                     # Step 3: Perform detailed check
-                    if self.is_in_state(point, states_directory, states[state_id]):
-                        visited_polygons[states[state_id]] += 1
+                    if self.is_in_state(point, states_polygons, us_states[state_id]):
+                        visited_polygons[us_states[state_id]] += 1
                         
                         # Skip the next hour of coordinates
                         skip_until = time + timedelta(hours=.5)
@@ -261,38 +270,39 @@ class Generator:
 
         # Add state polygons to map
         for state in visited_polygons:
-            state_polygon = self.get_state_polygon(state, states_directory)
+            state_polygon = self.get_state_polygon(states_polygons, state)
             state_polygon = [(lat, lon) for lon, lat in state_polygon.exterior.coords]
             folium.Polygon(locations=state_polygon, color="blue", fill=True).add_to(m)
 
         return m
     
-    def get_state_polygon(self, state, states_directory):
-        file_path = os.path.join(states_directory, state)
-        
-        # Open the file and load the JSON data
-        with open(file_path, 'r') as file:
-            state_poly = json.load(file)
+    def get_state_polygon(self, states_polygons, state):
+        for feature in states_polygons['features']:
+            if feature['properties']['name'] == state:
+                geom = feature['geometry']
+                if geom['type'] == 'Polygon':
+                    coordinates = geom['coordinates'][0]
+                    return Polygon(coordinates)
+                elif geom['type'] == 'MultiPolygon':
+                    # Flatten all polygons into one
+                    all_coords = []
+                    for poly in geom['coordinates']:
+                        all_coords.extend(poly[0])
+                    return Polygon(all_coords)
+        raise ValueError(f"State '{state}' not found in states_polygons")
 
-        return Polygon(state_poly['features'][0]['geometry']['coordinates'][0])
+    def is_in_state(self, point, states_polygons, state):
+        state_poly = self.get_state_polygon(states_polygons, state)
 
-    def is_in_state(self, point, states_directory, state):
-        file_path = os.path.join(states_directory, state)
-        
-        # Open the file and load the JSON data
-        with open(file_path, 'r') as file:
-            state_poly = json.load(file)
-
-        for feature in state_poly['features']:
-            if feature['geometry']['type'] == 'Polygon':
-                if shape(feature['geometry']).contains(point):
-                    return True
+        if state_poly.contains(point):
+            return True
         
         return False
 
     def loadNewJSONData(self, json_file, date_range):
         """Loads location data from the new JSON format with 'latLng' strings."""
         data = json.load(json_file)
+        data = data['semanticSegments']
         w = [Bar(), Percentage(), " ", ETA()]
         with ProgressBar(max_value=len(data), widgets=w) as pb:
             for i, entry in enumerate(data):
@@ -304,7 +314,7 @@ class Generator:
                     if 'start' in entry['activity'] and 'latLng' in entry['activity']['start']:
                         latlng = entry['activity']['start']['latLng']
                 elif 'timelinePath' in entry:
-                    latlng = entry['timelinePath']['point']
+                    latlng = entry['timelinePath'][0]['point']
                 if latlng:
                     # Parse latLng string: e.g. '53.7664594°, -8.9430112°'
                     lat_str, lon_str = latlng.replace('°', '').split(',')
